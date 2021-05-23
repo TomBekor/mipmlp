@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  .column {
+    float: left;
+    width: 33.33%;
+    padding: 5px;
+  }
+
+  .row::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  </style>
+
+
+  {% macro build_option(name, selected_att) -%}
+    {% if name == selected_att %}
+      <option value="{{ name }}" selected="selected">{{name}}</option>
+    {% else %}
+      <option value="{{ name }}">{{name}}</option>
+    {% endif %}
+    {%- endmacro %}
+
+
+  {% if images_names != None %}
+
+     <br>
+    <button>
+      <a href="/download-outputs">download graphs</a>
+    </button>
+    <br><br>
+    <div>
+      <label for="choose_graph">Choose a graph</label>
+      <select name="choose_graph" id="choose_graph">
+            javascript get input from
+            {{ build_option('Pearson correlation bacteria', choose_graph) }}
+            {{ build_option('Pearson correlation patient', choose_graph) }}
+            {{ build_option('Heatmap after standardization', choose_graph) }}
+            {{ build_option('Histogram of samples variance', choose_graph) }}
+            {{ build_option('Density of samples', choose_graph) }}
+            {{ build_option('Correlation between component and label', choose_graph) }}
+      </select>
+    </div>
+    <br>
+    <div>
+      <button id="graph_button" type="button" onclick=show_graph()>show</button>
+    </div>
+    <script>
+        function show_graph() {
+            const dict = {'Pearson correlation bacteria': 0, 'Pearson correlation patient': 1, 'Heatmap after standardization': 2,
+                'Histogram of samples variance': 3, 'Density of samples': 4, 'Correlation between component and label': 5};
+            const input = document.getElementById("choose_graph");
+            const name = input.options[input.selectedIndex].value;
+            const data = {{ images_names|safe }}
+            document.getElementById("img").src = data[dict[name]];
+            if (imageExists(data[dict[name]])){
+                document.getElementById("img").style = "height: 700px; width: 1000px"
+                document.getElementById("tagmsg").innerHTML = ""
+            }
+            else {
+                document.getElementById("img").style = "height: 0; width: 0"
+                document.getElementById("tagmsg").innerHTML = "no tag file given..."
+            }
+        }
+
+         function calculating() {
+             document.getElementById("calc").innerHTML = "Calculating...";
+        }
+
+
+        function imageExists(image_url){
+            var http = new XMLHttpRequest();
+            http.open('HEAD', image_url, false);
+            http.send();
+            return http.status != 404;
+        }
+    </script>
+
+    <body>
+        <p id="tagmsg"></p>
+        <p><img src="a.png"; style="height: 0; width: 0" id="img"  /></p>
+        <form method="post"  enctype=multipart/form-data class="">
+        <div>
+            <label for="tag_file">Select a Tag file:</label>
+            <input type=file id="tag_file" name="tag_file" value="{{tag_file}}">
+            <br><br>
+        </div>
+             <input type="submit" value="calculate" onclick="calculating()">
+        </form>
+        <p id = calc></p>
+    </body>
+  {% else %}
+      <h3> No results at the moment..</h3>
+  {% endif %}
+
+
+{% endblock %}

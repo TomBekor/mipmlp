@@ -37,7 +37,7 @@
     </script>
 
     <button id="biom_button" type="button" onclick="input_format_manager(true)">otu.biom and taxonomy.tsv</button>
-      <button id="csv_button" type="button" onclick="input_format_manager(false)">otu.csv with taxonomy included</button>
+    <button id="csv_button" type="button" onclick="input_format_manager(false)">otu.csv with taxonomy included</button>
 
     <br>
 
@@ -175,6 +175,10 @@
         document.getElementById("txt_mes").innerHTML = "";
     }
 
+    function image_page() {
+      open(URL="{{ '/' + 'Results' }}")
+    }
+
     </script>
 
   <style>
@@ -202,37 +206,9 @@
 
       <script>
       remove_mes()
+      image_page()
       </script>
 
-   <br>
-  <button>
-    <a href="/download-outputs">download</a>
-  </button>
-  <br>
-  <body>
-    <div class="row">
-      <div class="column">
-        <img src="{{ images_names[0] }}" style="width:110%">
-      </div>
-      <div class="column">
-        <img src="{{ images_names[1] }}" style="width:110%">
-      </div>
-      <div class="column">
-        <img src="{{ images_names[2] }}" style="width:110%">
-      </div>
-    </div>
-    <div class="row">
-      <div class="column">
-        <img src="{{ images_names[3] }}" style="width:100%">
-      </div>
-      <div class="column">
-        <img src="{{ images_names[4] }}" style="width:100%">
-      </div>
-      <div class="column">
-        <img src="{{ images_names[5] }}" style="width:100%">
-      </div>
-    </div>
-  </body>
   {% endif %}
 
 </section>

@@ -1,9 +1,11 @@
 import os
+import io
 import service
 import pandas as pd
 from zipfile import ZipFile
 from os.path import basename
 from biom import load_table
+import json
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, send_file
@@ -68,6 +70,9 @@ def home_page():
                 tag_file.save("TAG.csv")
             params = params_dict(taxonomy_level, taxnomy_group, epsilon, z_scoring, PCA, int(comp), normalization,
                                  norm_after_rel)
+            with open("templates/params.txt", "w") as f:
+                f.truncate(0)
+                f.write(json.dumps(params))
 
             service.evaluate(params, tag_flag)
 
@@ -112,6 +117,9 @@ def home_page():
         if error:
             flash(error)
         if not error:
+            with open("templates/im_name.txt", "w") as f:
+                f.truncate(0)
+                f.write(json.dumps(images_names))
             return render_template('home.html', active='Home', otu_table=otu_table, tag_file=tag_file,
                                    taxonomy_level=taxonomy_level,
                                    taxnomy_group=taxnomy_group, epsilon=epsilon, z_scoring=z_scoring, PCA=PCA,
@@ -148,6 +156,29 @@ def example_page():
 @bp.route('/About')
 def about_page():
     return render_template('about.html', active='About')
+
+@bp.route('/Results', methods=('GET', 'POST'))
+def results_page():
+    images_names = None
+    is_tag = False
+    path = STATIC_PATH + 'Correlation_between_each_component_and_the_labelprognosistask.svg'
+    if os.stat("templates/im_name.txt").st_size != 0:
+        with open("templates/im_name.txt", "r") as f:
+            images_names = json.loads(f.read())
+    if request.method == 'POST':
+        tag_file = request.files['tag_file']
+        tag_file.save("TAG.csv")
+        with open("templates/params.txt", "r") as f:
+            params = json.loads(f.read())
+        if tag_file or os.path.exists(path):
+            is_tag = True
+            service.evaluate(params, False)
+    if type(images_names) == list:
+        if len(images_names) < 6:
+            images_names.append("")
+        images_names[5] = path
+    return render_template('images.html', active='Results', images_names=images_names, is_tag=is_tag)
+
 
 
 @bp.route('/download-outputs')

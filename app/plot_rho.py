@@ -36,6 +36,8 @@ def draw_component_rhos_calculation_figure(bact_df, tag_df, task_name="prognosis
     real_rhos = []
     for com in components_df.columns:
         f = components_df[com]
+        f = pd.to_numeric(f, errors='coerce').fillna(0)
+        y = pd.to_numeric(y, errors='coerce').fillna(0)
         rho, pvalue = spearmanr(f, y, axis=None)
         real_rhos.append(rho)
 
