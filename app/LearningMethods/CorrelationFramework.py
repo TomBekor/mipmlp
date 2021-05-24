@@ -22,15 +22,15 @@ class _CorrelationPlotter:
         self.significant_correlation = significant_correlation
         self.correlation_tree = correlation_tree
 
-    def plot_graph(self, threshold):
-        draw_tree(self.correlation_tree, threshold)
+    def plot_graph(self, threshold=0.0):
+        draw_tree(self.correlation_tree, threshold=threshold)
 
     def plot_positive_negative_bars(self, ax: Axes, percentile, last_taxonomic_levels_to_keep=2, **kwargs):
         significant_bacteria = self.significant_correlation.get_most_significant_coefficients(percentile=percentile)
         if last_taxonomic_levels_to_keep is not None:
-            significant_bacteria.index = list(
-                map(lambda otu: ';'.join(str(otu).split(';')[-last_taxonomic_levels_to_keep:]),
-                    significant_bacteria.index))
+            significant_bacteria.index = [
+                str([h.strip(" gs0_1").capitalize() for h in i.split(";")][-2:]).replace("[", "").replace("]", "").replace("\'","")
+                for i in significant_bacteria.index]
         return PP.plot_positive_negative_bars(ax, significant_bacteria, **kwargs)
 
     def plot_real_and_shuffled_hist(self, ax: Axes, **kwargs):

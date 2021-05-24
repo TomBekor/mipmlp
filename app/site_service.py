@@ -19,9 +19,10 @@ STATIC_PATH = 'static/'
 @bp.route('/Home', methods=('GET', 'POST'))
 def home_page():
     error = None
+    prog = 0
     if request.method == 'POST':
         try:
-            os.remove(STATIC_PATH + "Correlation_between_each_component_and_the_labelprognosistask.svg")
+            os.remove(STATIC_PATH + "Correlation_between_each_component_and_the_label_prognosis_task.svg")
         except:
             print("")
         finally:
@@ -73,9 +74,7 @@ def home_page():
             with open("templates/params.txt", "w") as f:
                 f.truncate(0)
                 f.write(json.dumps(params))
-
             service.evaluate(params, tag_flag)
-
             # create a ZipFile object
             with ZipFile('sampleDir.zip', 'w') as zipObj:
                 # Iterate over all the files in directory
@@ -93,7 +92,6 @@ def home_page():
                             filePath = os.path.join(folderName, filename)
                             # Add file to zip
                             zipObj.write(filePath, basename(filePath))
-
             images_names = [
                 STATIC_PATH + 'correlation_heatmap_bacteria.png',
                 STATIC_PATH + 'correlation_heatmap_patient.png',
@@ -104,7 +102,7 @@ def home_page():
             ]
 
             if not tag_flag:
-                images_names.append(STATIC_PATH + 'Correlation_between_each_component_and_the_labelprognosistask.svg')
+                images_names.append(STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.svg')
 
             try:
                 os.remove("TAG.csv")
@@ -161,7 +159,7 @@ def about_page():
 def results_page():
     images_names = None
     is_tag = False
-    path = STATIC_PATH + 'Correlation_between_each_component_and_the_labelprognosistask.svg'
+    path = STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.svg'
     if os.stat("templates/im_name.txt").st_size != 0:
         with open("templates/im_name.txt", "r") as f:
             images_names = json.loads(f.read())

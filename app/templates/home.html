@@ -159,7 +159,7 @@
 
     {% for message in get_flashed_messages() %}
 {#    {% if message == "The number of components should be -1 or positive integer (not 0)." %}#}
-    <p style="color: red">{{ message }}</p>
+    <p style="color: firebrick">{{ message }}</p>
 {#    {% endif %}#}
     {% endfor %}
 
@@ -173,6 +173,8 @@
 
     function remove_mes() {
         document.getElementById("txt_mes").innerHTML = "";
+                document.getElementById("progbar").style = "height:0"
+
     }
 
     function image_page() {

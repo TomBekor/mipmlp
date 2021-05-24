@@ -12,6 +12,9 @@ from distance_learning_func import distance_learning
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
+from LearningMethods.CorrelationFramework import CorrelationFramework
+from Plot.plot_triple_corr import use_corr_framwork
+
 
 def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
     taxnomy_level = int(dict_params['taxonomy_level'])
@@ -159,7 +162,11 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         as_data_frame_b_pca = as_data_frame
 
     if visualize_data and map_file is not None:
-        draw_component_rhos_calculation_figure(as_data_frame, map_file, save_folder=folder)
+        #draw_component_rhos_calculation_figure(as_data_frame, map_file, save_folder=folder)
+        map_file = pd.to_numeric(map_file.squeeze(), errors='coerce').fillna(0)
+        use_corr_framwork(as_data_frame, map_file,
+                          title="Correlation_between_each_component_and_the_label_prognosis_task", folder=folder)
+
 
     if pca[0] != 0:
         print('perform ' + pca[1] + ' ...')
