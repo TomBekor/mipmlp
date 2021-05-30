@@ -1,7 +1,7 @@
 from LearningMethods.textreeCreate import create_tax_tree
 import networkx as nx
 import pickle
-import pygraphviz
+#import pygraphviz
 from networkx.drawing.nx_agraph import graphviz_layout
 import matplotlib.pyplot as plt
 
@@ -30,8 +30,8 @@ def draw_tree(graph, threshold=0.0):
                 colormap.append("yellow")
             sizemap.append(node[1] / 1000 + 5)
     # drawing the graph
-    pos = graphviz_layout(graph, prog="twopi", root="base")
-    #pos = nx.spring_layout(graph)
+    #pos = graphviz_layout(graph, prog="twopi", root="base")
+    pos = nx.spring_layout(graph)
     lpos = {}
     for key, loc in pos.items():
         lpos[key] = (loc[0], loc[1] + 0.02)
