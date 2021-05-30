@@ -12,8 +12,7 @@ from distance_learning_func import distance_learning
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
-from LearningMethods.CorrelationFramework import CorrelationFramework
-from Plot.plot_triple_corr import use_corr_framwork
+from LearningMethods.CorrelationFramework import use_corr_framwork
 
 
 def preprocess_data(data, dict_params, map_file=None, visualize_data=False):

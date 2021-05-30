@@ -40,8 +40,6 @@ def home_page():
         normalization = request.form['normalization']
         norm_after_rel = request.form['norm_after_rel']
 
-        if not otu_csv and not otu_table and not taxonomy_file:
-            error = "Input files are missing."
         if not otu_csv:
             if not otu_table:
                 error = "OTU table is missing."
@@ -49,11 +47,10 @@ def home_page():
                 error = "Taxnomy file is missing."
         if not otu_table and not taxonomy_file:
             if not otu_csv:
-                error = "OTU csv is missing."
+                error = "Input files are missing."
         if int(comp) == 0:
             error = "The number of components should be -1 or positive integer (not 0)."
-        else:
-
+        if not error:
             table_path = "table.biom"
             taxonomy_path = "taxonomy.tsv"
             otu_path = "OTU.csv"
