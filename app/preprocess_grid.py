@@ -13,11 +13,13 @@ from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
 from LearningMethods.CorrelationFramework import use_corr_framwork
+from plot_relative_frequency import plot_rel_freq
 
 
 def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
-    taxnomy_level = int(dict_params['taxonomy_level'])
+    taxonomy_level = int(dict_params['taxonomy_level'])
     preform_taxnomy_group = dict_params['taxnomy_group']
+    tax_level_plot = dict_params["tax_level_plot"]
     eps_for_zeros = float(dict_params['epsilon'])
     preform_norm = dict_params['normalization']
     preform_z_scoring = dict_params['z_scoring']
@@ -46,41 +48,9 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         indexes_of_non_zeros = data_frame_flatten != 0
         visualize_preproccess(data_frame_for_vis, indexes_of_non_zeros, 'Before Taxonomy group', [321, 322])
 
-    if preform_taxnomy_group != '':
-        print('Perform taxonomy grouping...')
-        # union taxonomy level by group level
-        # spliting the taxonomy level column
+        data_frame_for_vis = as_data_frame.copy()
 
-        taxonomy_reduced = as_data_frame[taxonomy_col].map(lambda x: x.split(';'))
-        if preform_taxnomy_group == 'sub PCA':
-            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:]))
-        else:
-            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:taxnomy_level]))
-        as_data_frame[taxonomy_col] = taxonomy_reduced
-        # group by mean
-        if preform_taxnomy_group == 'mean':
-            print('mean')
-            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).mean()
-        # group by sum
-        elif preform_taxnomy_group == 'sum':
-            print('sum')
-            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).sum()
-            # group by anna PCA
-        elif preform_taxnomy_group == 'sub PCA':
-            print('PCA')
-            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).mean()
-            # as_data_frame = as_data_frame.T
-            # as_data_frame.columns = as_data_frame.iloc[[-1]].values[0]
-            # as_data_frame, _ = distance_learning(perform_distance=True, level=taxnomy_level, preproccessed_data=as_data_frame.iloc[:-1], mapping_file=map_file).T
-            # as_data_frame_b_pca = as_data_frame
-
-        as_data_frame = as_data_frame.T
-        # here the samples are columns
-    else:
-        try:
-            as_data_frame = as_data_frame.drop(taxonomy_col, axis=1).T
-        except:
-            pass
+    as_data_frame = taxonomy_grouping(as_data_frame, preform_taxnomy_group, taxonomy_level, taxonomy_col)
 
     if visualize_data:
         data_frame_flatten = as_data_frame.values.flatten()
@@ -91,6 +61,7 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         samples_density.hist(bins=100, facecolor='Blue')
         plt.title(f'Density of samples')
         plt.savefig(os.path.join(folder, "density_of_samples.svg"), bbox_inches='tight', format='svg')
+        plt.clf()
 
     # drop bacterias with single values
     as_data_frame = drop_rare_bacteria(as_data_frame)
@@ -111,6 +82,7 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
                 f'Histogram of samples variance before z-scoring\nmean={samples_variance.values.mean()},'
                 f' std={samples_variance.values.std()}')
             plt.savefig(os.path.join(folder, "samples_variance.svg"), bbox_inches='tight', format='svg')
+            plt.clf()
 
         if preform_z_scoring != 'No':
             as_data_frame = z_score(as_data_frame, preform_z_scoring)
@@ -121,42 +93,54 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
             as_data_frame = z_score(as_data_frame, 'col')
 
     if visualize_data:
+        data_frame_for_vis = taxonomy_grouping(data_frame_for_vis, preform_taxnomy_group="mean", taxonomy_level=tax_level_plot, taxonomy_col=taxonomy_col, toPrint=False)
+        data_frame_for_vis = row_normalization(data_frame_for_vis)
+        plt.clf()
+        plot_rel_freq(data_frame_for_vis, "static", tax_level_plot)
+
+
+
+    if visualize_data:
         data_frame_flatten = as_data_frame.values.flatten()
         indexes_of_non_zeros = data_frame_flatten != 0
         plt.figure('Preprocess')
         visualize_preproccess(as_data_frame, indexes_of_non_zeros, 'After-Taxonomy - After', [325, 326])
         plt.subplots_adjust(hspace=0.5, wspace=0.5)
         plt.savefig(os.path.join(folder, "preprocess.svg"), bbox_inches='tight', format='svg')
+        plt.clf()
+
     if visualize_data:
         plt.figure('standard heatmap')
         sns.heatmap(as_data_frame, cmap="Blues", xticklabels=False, yticklabels=False)
-        plt.title('Heatmap after standardization and taxonomy group level ' + str(taxnomy_level))
+        plt.title('Heatmap after standardization and taxonomy group level ' + str(taxonomy_level))
         plt.savefig(os.path.join(folder, "standard_heatmap.png"))
+        plt.clf()
         corr_method = 'pearson'
         corr_name = 'Pearson'
         # if samples on both axis needed, specify the vmin, vmax and mathod
         plt.figure('correlation heatmap patient')
         sns.heatmap(as_data_frame.T.corr(method=corr_method), cmap='Blues', vmin=-1, vmax=1, xticklabels=False,
                     yticklabels=False)
-        plt.title(corr_name + ' correlation patient with taxonomy level ' + str(taxnomy_level))
+        plt.title(corr_name + ' correlation patient with taxonomy level ' + str(taxonomy_level))
         # plt.savefig(os.path.join(folder, "correlation_heatmap_patient.svg"), bbox_inches='tight', format='svg')
         plt.savefig(os.path.join(folder, "correlation_heatmap_patient.png"))
+        plt.clf()
 
         plt.figure('correlation heatmap bacteria')
         sns.heatmap(as_data_frame.corr(method=corr_method), cmap='Blues', vmin=-1, vmax=1, xticklabels=False,
                     yticklabels=False)
-        plt.title(corr_name + ' correlation bacteria with taxonomy level ' + str(taxnomy_level))
+        plt.title(corr_name + ' correlation bacteria with taxonomy level ' + str(taxonomy_level))
         # plt.savefig(os.path.join(folder, "correlation_heatmap_bacteria.svg"), bbox_inches='tight', format='svg')
         plt.savefig(os.path.join(folder, "correlation_heatmap_bacteria.png"))
         # plt.show()
-        plt.close()
         plt.clf()
+        plt.close()
 
     as_data_frame_b_pca = as_data_frame.copy()
     bacteria = as_data_frame.columns
 
     if preform_taxnomy_group == 'sub PCA':
-        as_data_frame, _ = distance_learning(perform_distance=True, level=taxnomy_level,
+        as_data_frame, _ = distance_learning(perform_distance=True, level=taxonomy_level,
                                              preproccessed_data=as_data_frame, mapping_file=map_file)
         as_data_frame_b_pca = as_data_frame
 
@@ -183,6 +167,7 @@ def visualize_preproccess(as_data_frame, indexes_of_non_zeros, name, subplot_idx
     result = data_frame_flatten[indexes_of_non_zeros]
     plt.subplot(subplot_idx[1])
     plot_preprocess_stage(result, name + ' without zeros')
+    plt.clf()
 
 
 def plot_preprocess_stage(result, name, write_title=False, write_axis=True):
@@ -309,6 +294,48 @@ def apply_pca(data, n_components=15, dim_red_type='PCA', visualize=False):
         pca = FastICA(n_components=components)
         data_components = pca.fit_transform(data)
     return pd.DataFrame(data_components).set_index(data.index), pca, components
+
+def taxonomy_grouping(as_data_frame, preform_taxnomy_group, taxonomy_level, taxonomy_col, toPrint=True):
+    if preform_taxnomy_group != '':
+        if toPrint:
+            print('Perform taxonomy grouping...')
+        # union taxonomy level by group level
+        # spliting the taxonomy level column
+
+        taxonomy_reduced = as_data_frame[taxonomy_col].map(lambda x: x.split(';'))
+        if preform_taxnomy_group == 'sub PCA':
+            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:]))
+        else:
+            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:taxonomy_level]))
+        as_data_frame[taxonomy_col] = taxonomy_reduced
+        # group by mean
+        if preform_taxnomy_group == 'mean':
+            if toPrint:
+                print('mean')
+            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).mean()
+        # group by sum
+        elif preform_taxnomy_group == 'sum':
+            if toPrint:
+                print('sum')
+            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).sum()
+            # group by anna PCA
+        elif preform_taxnomy_group == 'sub PCA':
+            if toPrint:
+                print('PCA')
+            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).mean()
+            # as_data_frame = as_data_frame.T
+            # as_data_frame.columns = as_data_frame.iloc[[-1]].values[0]
+            # as_data_frame, _ = distance_learning(perform_distance=True, level=taxnomy_level, preproccessed_data=as_data_frame.iloc[:-1], mapping_file=map_file).T
+            # as_data_frame_b_pca = as_data_frame
+
+        as_data_frame = as_data_frame.T
+        # here the samples are columns
+    else:
+        try:
+            as_data_frame = as_data_frame.drop(taxonomy_col, axis=1).T
+        except:
+            pass
+    return as_data_frame
 
 
 def fill_taxonomy(as_data_frame, tax_col):

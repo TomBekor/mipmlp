@@ -1,0 +1,1 @@
+["static/correlation_heatmap_bacteria.png", "static/correlation_heatmap_patient.png", "static/standard_heatmap.png", "static/samples_variance.svg", "static/density_of_samples.svg", "static/relative_frequency_stacked.png"]

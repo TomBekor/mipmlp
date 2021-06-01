@@ -50,5 +50,4 @@ def use_corr_framwork(X: pd.DataFrame, y, title=None, folder=""):
         fig1.suptitle(title.replace("_", " "), fontsize=16)
 
     fig1.tight_layout()
-    fig1.show()
     fig1.savefig(f"{folder}/{title}.svg")
