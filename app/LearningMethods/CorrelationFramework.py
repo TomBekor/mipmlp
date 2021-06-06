@@ -22,9 +22,8 @@ class _CorrelationPlotter:
     def plot_positive_negative_bars(self, ax: Axes, percentile, last_taxonomic_levels_to_keep=2, **kwargs):
         significant_bacteria = self.significant_correlation.get_most_significant_coefficients(percentile=percentile)
         if last_taxonomic_levels_to_keep is not None:
-            significant_bacteria.index = [
-                str([h.lstrip(" gs_").strip(" _").capitalize() for h in i.split(";")][-2:]).replace("[", "").replace("]", "").replace("\'","")
-                for i in significant_bacteria.index]
+            significant_bacteria.index = [str([h[4:].strip("_").capitalize() for h in i.split(";")][-2:])
+                    .replace("[", "").replace("]", "").replace("\'", "") for i in significant_bacteria.index]
         return PP.plot_positive_negative_bars(ax, significant_bacteria, **kwargs)
 
     def plot_real_and_shuffled_hist(self, ax: Axes, **kwargs):
