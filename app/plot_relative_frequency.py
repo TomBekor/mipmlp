@@ -4,6 +4,7 @@ import numpy as np
 
 def plot_rel_freq(df: pd.DataFrame, folder=None, taxonomy_level=3):
     df = easy_otu_name(df)
+    df = df.reindex(df.mean().sort_values().index, axis=1)
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(8, 6), gridspec_kw={'width_ratios': [3, 1]})
     ax2.axis('off')
     df.plot.bar(stacked=True, ax=ax, width=1.0, colormap='Spectral')
