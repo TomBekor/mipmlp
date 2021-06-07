@@ -22,18 +22,22 @@
     </button>
     </p>
     <p>Step 2: Choose the running options like these in the below image:</p>
-    <img src="static/example_input_options.png" width=40% border="1px">
+    <img src="static/example_input_options_2.png" width=40% border="1px">
     <p>Step 3: Click the "calculate" button and after the run will finish (it could take around 20-40 seconds)
       the output plots will appear, and you will be able to download them with the "download" button.
      The output plots should look like this:</p>
-    <p><img src="static/plots_example1.png" style="width:90%"></p>
-    <p><img src="static/plots_example2.png" style="width:90%"></p>
-    <p>Upper left figure is a heatmap of the  correlation between the merged taxonomies.</p>
-    <p>Upper central figure is a heatmap of the  correlation between samples.</p>
-    <p>Upper right figure is a heatmap of the normalized samples.</p>
-    <p>Lower left figure is a histogram of the variance of samples. Samples with very low variance should probably be removed.</p>
-    <p>Lower central figure is a histogram of the total number of reads per sample. Samples with very low total number of reads should probably be removed.</p>
-    <p>Lower right figure only appears when a tag file is given and it represents the correlation between the grouped taxonomies and the tag.</p>
+    <p><img src="static/empty_pic_menu.png" width="=20%" border="1px"></p>
+    <p>You may now choose the plot that you would like to view:</p>
+    <p>First figure is a heatmap of the  correlation between the merged taxonomies.</p>
+    <p>Second figure is a heatmap of the  correlation between samples.</p>
+    <p>Third figure is a heatmap of the normalized samples.</p>
+    <p>Fourth figure is a histogram of the variance of samples. Samples with very low variance should probably be removed.</p>
+    <p>Fifth figure is a histogram of the total number of reads per sample. Samples with very low total number of reads should probably be removed.</p>
+    <p>Sixth figure is a plot of the prevalence of each taxonomic unit (Phylum, Class, Order) in each person.</p>
+    <p>Seventh only appears when a tag file is given and it represents the correlation between the grouped taxonomies and the tag.
+    <br>If a tag file is not given, it Will tell you that no tag file is given, and you may add  a tag file and calculate. After that, the figure will appear.</p>
+    <p>After you've chosen your plot, it should look like this:</p>
+    <p><img src="static/pic_menu.png" width="40%" border="1px"></p>
   </header>
 </section>
 {% endblock %}
