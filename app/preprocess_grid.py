@@ -7,16 +7,15 @@ from sklearn import preprocessing
 import seaborn as sns
 from collections import Counter
 
-from plot_rho import draw_component_rhos_calculation_figure
-from distance_learning_func import distance_learning
+from Preprocess.distance_learning_func import distance_learning
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
 from LearningMethods.CorrelationFramework import use_corr_framwork
-from plot_relative_frequency import plot_rel_freq
+from Plot.plot_relative_frequency import plot_rel_freq
 
 
-def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
+def preprocess_data(data, dict_params: dict, map_file, visualize_data=False):
     taxonomy_level = int(dict_params['taxonomy_level'])
     preform_taxnomy_group = dict_params['taxnomy_group']
     tax_level_plot = dict_params["tax_level_plot"]
@@ -24,6 +23,8 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
     preform_norm = dict_params['normalization']
     preform_z_scoring = dict_params['z_scoring']
     relative_z = dict_params['norm_after_rel']
+    correlation_removal_threshold = dict_params.get('correlation_threshold', None)
+    rare_bacteria_threshold = dict_params.get('rare_bacteria_threshold', None)
     var_th_delete = float(dict_params['std_to_delete'])
     pca = dict_params['pca']
 
@@ -50,7 +51,45 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
 
         data_frame_for_vis = as_data_frame.copy()
 
-    as_data_frame = taxonomy_grouping(as_data_frame, preform_taxnomy_group, taxonomy_level, taxonomy_col)
+    if preform_taxnomy_group != '':
+        print('Perform taxonomy grouping...')
+        # union taxonomy level by group level
+        # spliting the taxonomy level column
+
+        taxonomy_reduced = as_data_frame[taxonomy_col].map(lambda x: x.split(';'))
+        if preform_taxnomy_group == 'sub PCA':
+            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:]))
+        else:
+            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:taxonomy_level]))
+        as_data_frame[taxonomy_col] = taxonomy_reduced
+        # group by mean
+        if preform_taxnomy_group == 'mean':
+            print('mean')
+            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).mean()
+        # group by sum
+        elif preform_taxnomy_group == 'sum':
+            print('sum')
+            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).sum()
+            # group by anna PCA
+        elif preform_taxnomy_group == 'sub PCA':
+            print('PCA')
+            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).mean()
+            # as_data_frame = as_data_frame.T
+            # as_data_frame.columns = as_data_frame.iloc[[-1]].values[0]
+            # as_data_frame, _ = distance_learning(perform_distance=True, level=taxnomy_level, preproccessed_data=as_data_frame.iloc[:-1], mapping_file=map_file).T
+            # as_data_frame_b_pca = as_data_frame
+
+        as_data_frame = as_data_frame.T
+        # here the samples are columns
+    else:
+        try:
+            as_data_frame = as_data_frame.drop(taxonomy_col, axis=1).T
+        except:
+            pass
+
+    # remove highly correlated bacteria
+    if correlation_removal_threshold is not None:
+        as_data_frame = dropHighCorr(as_data_frame, correlation_removal_threshold)
 
     if visualize_data:
         data_frame_flatten = as_data_frame.values.flatten()
@@ -64,7 +103,8 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         plt.clf()
 
     # drop bacterias with single values
-    as_data_frame = drop_rare_bacteria(as_data_frame)
+    if rare_bacteria_threshold is not None:
+        as_data_frame = drop_rare_bacteria(as_data_frame, rare_bacteria_threshold)
 
     if preform_norm == 'log':
         print('Perform log normalization...')
@@ -86,6 +126,8 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
 
         if preform_z_scoring != 'No':
             as_data_frame = z_score(as_data_frame, preform_z_scoring)
+
+
     elif preform_norm == 'relative':
         print('Perform relative normalization...')
         as_data_frame = row_normalization(as_data_frame)
@@ -93,11 +135,14 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
             as_data_frame = z_score(as_data_frame, 'col')
 
     if visualize_data:
-        data_frame_for_vis = taxonomy_grouping(data_frame_for_vis, preform_taxnomy_group="mean", taxonomy_level=tax_level_plot, taxonomy_col=taxonomy_col, toPrint=False)
+        taxonomy_reduced = data_frame_for_vis[taxonomy_col].map(lambda x: x.split(';'))
+        taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:tax_level_plot]))
+        data_frame_for_vis[taxonomy_col] = taxonomy_reduced
+        data_frame_for_vis = data_frame_for_vis.groupby(data_frame_for_vis[taxonomy_col]).mean()
+        data_frame_for_vis = data_frame_for_vis.T
         data_frame_for_vis = row_normalization(data_frame_for_vis)
         plt.clf()
         plot_rel_freq(data_frame_for_vis, "static", tax_level_plot)
-
 
 
     if visualize_data:
@@ -149,7 +194,6 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         map_file = pd.to_numeric(map_file.squeeze(), errors='coerce').fillna(0)
         use_corr_framwork(as_data_frame, map_file,
                           title="Correlation_between_each_component_and_the_label_prognosis_task", folder=folder)
-
 
     if pca[0] != 0:
         print('perform ' + pca[1] + ' ...')
@@ -229,7 +273,17 @@ def drop_bacteria(as_data_frame):
     return as_data_frame.drop(columns=bacterias_to_dump)
 
 
-def drop_rare_bacteria(as_data_frame):
+def dropHighCorr(data, threshold):
+    corr = data.corr()
+    df_not_correlated = ~(corr.mask(np.tril(np.ones([len(corr)] * 2, dtype=bool))).abs() > threshold).any()
+    un_corr_idx = df_not_correlated.loc[df_not_correlated[df_not_correlated.index] == True].index
+    df_out = data[un_corr_idx]
+    number_of_bacteria_dropped = len(data.columns) - len(df_out.columns)
+    print('{} bacteria were dropped due to high correlation with other columns'.format(number_of_bacteria_dropped))
+    return df_out
+
+
+def drop_rare_bacteria(as_data_frame, threshold):
     bact_to_num_of_non_zeros_values_map = {}
     bacteria = as_data_frame.columns
     num_of_samples = len(as_data_frame.index) - 1
@@ -246,10 +300,10 @@ def drop_rare_bacteria(as_data_frame):
 
     rare_bacteria = []
     for key, val in bact_to_num_of_non_zeros_values_map.items():
-        if val < 5:
+        if val < threshold:
             rare_bacteria.append(key)
     as_data_frame.drop(columns=rare_bacteria, inplace=True)
-    print(str(len(rare_bacteria)) + " bacteria with less then 5 non-zero value: ")
+    print("{} bacteria with less then {} non-zero value: ".format(len(rare_bacteria), threshold))
     return as_data_frame
 
 
@@ -295,48 +349,6 @@ def apply_pca(data, n_components=15, dim_red_type='PCA', visualize=False):
         data_components = pca.fit_transform(data)
     return pd.DataFrame(data_components).set_index(data.index), pca, components
 
-def taxonomy_grouping(as_data_frame, preform_taxnomy_group, taxonomy_level, taxonomy_col, toPrint=True):
-    if preform_taxnomy_group != '':
-        if toPrint:
-            print('Perform taxonomy grouping...')
-        # union taxonomy level by group level
-        # spliting the taxonomy level column
-
-        taxonomy_reduced = as_data_frame[taxonomy_col].map(lambda x: x.split(';'))
-        if preform_taxnomy_group == 'sub PCA':
-            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:]))
-        else:
-            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:taxonomy_level]))
-        as_data_frame[taxonomy_col] = taxonomy_reduced
-        # group by mean
-        if preform_taxnomy_group == 'mean':
-            if toPrint:
-                print('mean')
-            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).mean()
-        # group by sum
-        elif preform_taxnomy_group == 'sum':
-            if toPrint:
-                print('sum')
-            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).sum()
-            # group by anna PCA
-        elif preform_taxnomy_group == 'sub PCA':
-            if toPrint:
-                print('PCA')
-            as_data_frame = as_data_frame.groupby(as_data_frame[taxonomy_col]).mean()
-            # as_data_frame = as_data_frame.T
-            # as_data_frame.columns = as_data_frame.iloc[[-1]].values[0]
-            # as_data_frame, _ = distance_learning(perform_distance=True, level=taxnomy_level, preproccessed_data=as_data_frame.iloc[:-1], mapping_file=map_file).T
-            # as_data_frame_b_pca = as_data_frame
-
-        as_data_frame = as_data_frame.T
-        # here the samples are columns
-    else:
-        try:
-            as_data_frame = as_data_frame.drop(taxonomy_col, axis=1).T
-        except:
-            pass
-    return as_data_frame
-
 
 def fill_taxonomy(as_data_frame, tax_col):
     df_tax = as_data_frame[tax_col].str.split(';', expand=True)
@@ -352,3 +364,17 @@ def fill_taxonomy(as_data_frame, tax_col):
                              df_tax[5] + ';' + df_tax[6]
 
     return as_data_frame
+
+
+def from_biom(biom_file_path, taxonomy_file_path, otu_dest_path, **kwargs):
+    # Load the biom table and rename index.
+    from biom import load_table
+    otu_table = load_table(biom_file_path).to_dataframe(True)
+    # Load the taxonomy file and extract the taxonomy column.
+    taxonomy = pd.read_csv(taxonomy_file_path, index_col=0, sep=None, **kwargs).drop('Confidence', axis=1,
+                                                                                     errors='ignore')
+    otu_table = pd.merge(otu_table, taxonomy, right_index=True, left_index=True)
+    otu_table.rename({'Taxon': 'taxonomy'}, inplace=True, axis=1)
+    otu_table = otu_table.transpose()
+    otu_table.index.name = 'ID'
+    otu_table.to_csv(otu_dest_path)
