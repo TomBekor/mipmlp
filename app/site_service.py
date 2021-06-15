@@ -39,6 +39,8 @@ def home_page():
         comp = request.form['comp']
         normalization = request.form['normalization']
         norm_after_rel = request.form['norm_after_rel']
+        alpha_div = request.form['alpha_div']
+        beta_div = request.form['beta_div']
 
         if not otu_csv:
             if not otu_table:
@@ -67,7 +69,7 @@ def home_page():
                 tag_flag = False
                 tag_file.save("TAG.csv")
             params = params_dict(taxonomy_level, taxnomy_group, tax_level_plot, epsilon, z_scoring, PCA, int(comp), normalization,
-                                 norm_after_rel)
+                                 norm_after_rel, alpha_div, beta_div)
             with open("templates/params.txt", "w") as f:
                 f.truncate(0)
                 f.write(json.dumps(params))
@@ -83,8 +85,7 @@ def home_page():
                         zipObj.write(filePath, basename(filePath))
                 for folderName, subfolders, filenames in os.walk(STATIC_PATH):
                     for filename in filenames:
-                        if not (filename == "old_example_input_files.zip" or filename == "old_Example_input_options.png"
-                                or filename == "plots_example1.png" or filename == "plots_example2.png"):
+                        if "example" not in filename:
                             # create complete filepath of file in directory
                             filePath = os.path.join(folderName, filename)
                             # Add file to zip
@@ -93,13 +94,14 @@ def home_page():
                 STATIC_PATH + 'correlation_heatmap_bacteria.png',
                 STATIC_PATH + 'correlation_heatmap_patient.png',
                 STATIC_PATH + 'standard_heatmap.png',
-                STATIC_PATH + 'samples_variance.svg',
-                STATIC_PATH + 'density_of_samples.svg',
-                STATIC_PATH + 'relative_frequency_stacked.png'
+                STATIC_PATH + 'samples_variance.png',
+                STATIC_PATH + 'density_of_samples.png',
+                STATIC_PATH + 'relative_frequency_stacked.png',
+                STATIC_PATH + 'beta_diversity.png'
             ]
 
             if not tag_flag:
-                images_names.append(STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.svg')
+                images_names.append(STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.png')
 
             try:
                 os.remove("TAG.csv")
@@ -170,9 +172,9 @@ def results_page():
             is_tag = True
             service.evaluate(params, False)
     if type(images_names) == list:
-        if len(images_names) < 7:
+        if len(images_names) < 8:
             images_names.append("")
-        images_names[6] = path
+        images_names[7] = path
     return render_template('images.html', active='Results', images_names=images_names, is_tag=is_tag)
 
 
@@ -187,7 +189,7 @@ def download_example():
     return send_file(STATIC_PATH + "example_input_files.zip", mimetype='zip', as_attachment=True, )
 
 
-def params_dict(taxonomy_level, taxnomy_group, tax_level_plot, epsilon, z_scoring, pca, comp, normalization, norm_after_rel):
+def params_dict(taxonomy_level, taxnomy_group, tax_level_plot, epsilon, z_scoring, pca, comp, normalization, norm_after_rel, alpha_div, beta_div):
     taxonomy_level_dict = {"Order": 4, "Family": 5, "Genus": 6, "Specie": 7}
     taxonomy_group_dict = {"Sub-PCA": 'sub PCA', "Mean": 'mean', "Sum": 'sum'}
     tax_level_plot_dict = {"Class": 3, "Phylum": 2, "Order": 4}
@@ -195,6 +197,8 @@ def params_dict(taxonomy_level, taxnomy_group, tax_level_plot, epsilon, z_scorin
     normalization_dict = {"Log": 'log', "Relative": 'relative'}
     norm_after_rel_dict = {"No": 'No', "Yes": 'z_after_relative'}
     dimension_reduction_dict = {"PCA": (comp, 'PCA'), "ICA": (comp, 'ICA'), "None": (0, 'PCA')}
+    alpha_div_dict = {"Shannon": "shannon", "Observed OTUs": "observed_otus", "Chao1": "chao1"}
+    beta_div_dict = {"Unwieghted unifrac": "unwieghted_unifrac", "Weighted unifrac": "wieghted_unifrac", "Bray-Curtis": "braycurtis"}
     params = {
         'taxonomy_level': taxonomy_level_dict[taxonomy_level],
         'taxnomy_group': taxonomy_group_dict[taxnomy_group],
@@ -204,7 +208,9 @@ def params_dict(taxonomy_level, taxnomy_group, tax_level_plot, epsilon, z_scorin
         'z_scoring': z_scoring_dict[z_scoring],
         'norm_after_rel': norm_after_rel_dict[norm_after_rel],
         'std_to_delete': 0,
-        'pca': dimension_reduction_dict[pca]
+        'pca': dimension_reduction_dict[pca],
+        'alpha_div': alpha_div_dict[alpha_div],
+        'beta_div': beta_div_dict[beta_div]
     }
     print(params)
     return params

@@ -12,7 +12,7 @@ from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
 from LearningMethods.CorrelationFramework import use_corr_framwork
-from Plot.plot_relative_frequency import plot_rel_freq
+from Plot import plot_relative_frequency
 
 
 def preprocess_data(data, dict_params: dict, map_file, visualize_data=False):
@@ -99,7 +99,7 @@ def preprocess_data(data, dict_params: dict, map_file, visualize_data=False):
         plt.figure('Density of samples')
         samples_density.hist(bins=100, facecolor='Blue')
         plt.title(f'Density of samples')
-        plt.savefig(os.path.join(folder, "density_of_samples.svg"), bbox_inches='tight', format='svg')
+        plt.savefig(os.path.join(folder, "density_of_samples.png"), bbox_inches='tight', format='svg')
         plt.clf()
 
     # drop bacterias with single values
@@ -121,7 +121,7 @@ def preprocess_data(data, dict_params: dict, map_file, visualize_data=False):
             plt.title(
                 f'Histogram of samples variance before z-scoring\nmean={samples_variance.values.mean()},'
                 f' std={samples_variance.values.std()}')
-            plt.savefig(os.path.join(folder, "samples_variance.svg"), bbox_inches='tight', format='svg')
+            plt.savefig(os.path.join(folder, "samples_variance.png"), bbox_inches='tight', format='svg')
             plt.clf()
 
         if preform_z_scoring != 'No':
@@ -135,17 +135,10 @@ def preprocess_data(data, dict_params: dict, map_file, visualize_data=False):
             as_data_frame = z_score(as_data_frame, 'col')
 
     if visualize_data:
-        taxonomy_reduced = data_frame_for_vis[taxonomy_col].map(lambda x: x.split(';'))
-        taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:tax_level_plot]))
-        data_frame_for_vis[taxonomy_col] = taxonomy_reduced
-        data_frame_for_vis = data_frame_for_vis.groupby(data_frame_for_vis[taxonomy_col]).mean()
-        data_frame_for_vis = data_frame_for_vis.T
-        data_frame_for_vis = row_normalization(data_frame_for_vis)
         plt.clf()
-        plot_rel_freq(data_frame_for_vis, "static", tax_level_plot)
+        plot_relative_frequency.plot_rel_freq(data_frame_for_vis, taxonomy_col, tax_level_plot, "static")
 
-
-    if visualize_data:
+    if visualize_data and False:
         data_frame_flatten = as_data_frame.values.flatten()
         indexes_of_non_zeros = data_frame_flatten != 0
         plt.figure('Preprocess')

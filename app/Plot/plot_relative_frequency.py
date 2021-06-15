@@ -1,8 +1,19 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from  mipmlp.app import preprocess_grid
 
-def plot_rel_freq(df: pd.DataFrame, folder=None, taxonomy_level=3):
+def plot_rel_freq(data_frame, taxonomy_col="taxonomy", tax_level=3, folder=None):
+        taxonomy_reduced = data_frame[taxonomy_col].map(lambda x: x.split(';'))
+        taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:tax_level]))
+        data_frame[taxonomy_col] = taxonomy_reduced
+        data_frame = data_frame.groupby(data_frame[taxonomy_col]).mean()
+        data_frame = data_frame.T
+        data_frame = preprocess_grid.row_normalization(data_frame)
+        plotting_with_pd(data_frame, folder, tax_level)
+
+
+def plotting_with_pd(df: pd.DataFrame, folder=None, taxonomy_level=3):
     df = easy_otu_name(df)
     df = df.reindex(df.mean().sort_values().index, axis=1)
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(8, 6), gridspec_kw={'width_ratios': [3, 1]})

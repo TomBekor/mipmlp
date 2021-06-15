@@ -1,52 +1,36 @@
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from sklearn.manifold import MDS
 from mpl_toolkits.mplot3d import Axes3D
 import os
 import numpy as np
 from scipy import stats
+import pandas as pd
 
 
-def plot_data_3d(X_all, y, data_name, save=False, folder=None):
-    X_3D = np.array([x[:3] for x in X_all])
-
-    x_min, x_max = X_3D[:, 0].min() - .5, X_3D[:, 0].max() + .5
-    y_min, y_max = X_3D[:, 1].min() - .5, X_3D[:, 1].max() + .5
-
-    plt.figure(2, figsize=(8, 6))
-    plt.clf()
-
-    plt.xlim(x_min, x_max)
-    plt.ylim(y_min, y_max)
-    plt.xticks(())
-    plt.yticks(())
-
-    # To getter a better understanding of interaction of the dimensions
-    # plot the first three PCA dimensions
-    fig = plt.figure(1, figsize=(8, 6))
-    ax = Axes3D(fig, elev=-150, azim=110)
-    X_reduced = PCA(n_components=3).fit_transform(X_all)
-    ax.scatter(X_reduced[:, 0], X_reduced[:, 1], X_reduced[:, 2], c=y,
-               cmap=plt.cm.Set3, edgecolor='k') #, s=25)
-    ax.set_title(data_name.replace("_", " ") + "\nFirst three PCA directions")
-    ax.set_xlabel("1st eigenvector")
-    ax.w_xaxis.set_ticklabels([])
-    ax.set_ylabel("2nd eigenvector")
-    ax.w_yaxis.set_ticklabels([])
-    ax.set_zlabel("3rd eigenvector")
-    ax.w_zaxis.set_ticklabels([])
-    if save:
-        if folder:
-            plt.savefig(os.path.join(folder, data_name + "_3D_pca_display.svg"), bbox_inches='tight', format='svg')
+def plot_data_3d(X_3d: pd.DataFrame, color: pd.Series, color_dict=None, labels_dict: dict = None, size=10):
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    groups = X_3d.groupby(color)
+    for name, group in groups:
+        if color_dict is None and labels_dict is None:
+            ax.scatter(group.iloc[:, 0], group.iloc[:, 1], group.iloc[:, 2],depthshade=False)
+        elif color_dict is None:
+            ax.scatter(group.iloc[:, 0], group.iloc[:, 1], group.iloc[:, 2], label=labels_dict[name],depthshade=False)
+        elif labels_dict is None:
+            ax.scatter(group.iloc[:, 0], group.iloc[:, 1], group.iloc[:, 2], c=color_dict[name],depthshade=False)
         else:
-            plt.savefig(data_name + "_3D_pca_display.svg", bbox_inches='tight', format='svg')
-    else:
-        plt.show()
-    plt.close()
+            ax.scatter(group.iloc[:, 0], group.iloc[:, 1], group.iloc[:, 2],
+                       c=color_dict[name], label=labels_dict[name],depthshade=False)
+    ax.set_xlabel(X_3d.columns[0], size=size)
+    ax.set_ylabel(X_3d.columns[1], size=size)
+    ax.set_zlabel(X_3d.columns[2], size=size)
+    fig.legend()
 
+    return fig, ax
 
 
 def plot_data_2d(X_all, y, data_name, save=False, folder=None):
-
     plt.close()
     X_2D = np.array([x[:2] for x in X_all])
 
@@ -77,7 +61,7 @@ def plot_data_2d(X_all, y, data_name, save=False, folder=None):
     plt.yticks([], [])
     X_reduced = PCA(n_components=2).fit_transform(X_all)
     ax.scatter(X_reduced[:, 0], X_reduced[:, 1], c=y_,
-                edgecolor='k')  #cmap=plt.cm.Set3,  , s=25)
+               edgecolor='k')  # cmap=plt.cm.Set3,  , s=25)
     ax.set_title(data_name.replace("_", " ") + "\nFirst two PCA directions")
     ax.set_xlabel("1st eigenvector")
     ax.set_ylabel("2nd eigenvector")
@@ -108,7 +92,8 @@ def PCA_t_test(group_1, group_2, title="t_test", save=False, folder=None):
                 os.makedirs(folder)
             with open(os.path.join(folder, title.replace(" ", "_") + ".txt"), "w") as file:
                 for i, res in enumerate(result):
-                    file.write("dim " + str(i+1) + "\n" + "statistic=" + str(round(res[0], 5)) + " pvalue=" + str(round(res[1], 5)) + "\n")
+                    file.write("dim " + str(i + 1) + "\n" + "statistic=" + str(round(res[0], 5)) + " pvalue=" + str(
+                        round(res[1], 5)) + "\n")
         else:
             with open(title.replace(" ", "_") + ".txt", "w") as file:
                 for i, res in enumerate(result):
@@ -117,7 +102,17 @@ def PCA_t_test(group_1, group_2, title="t_test", save=False, folder=None):
 
     return result
 
+def PCoA_and_plot(dist, title="beta_diversity", folder="Plot", n_comp=3, **kwargs):
+    mds = MDS(n_components=n_comp, dissimilarity="precomputed", **kwargs)
+    pos = mds.fit(dist).embedding_
+    if n_comp == 3:
+        fig, ax = plot_data_3d(pd.DataFrame(pos), pd.Series(range(256)))
+        ax.set_title(title)
+        plt.savefig(f"{folder}/{title}.png")
+    else:
+        print("No visualization for dims other then three.")
+    return pos
+
 
 if __name__ == "__main__":
     PCA_t_test()
-

@@ -3,18 +3,19 @@
 {% block content %}
 <section class="content">
   <header>
-    <p>When performing MIP-MLP, one has to select seven choices:</p>
+    <p>When performing MIP-MLP, one has to select ten choices:</p>
     <p>A. The taxonomy level used (we propose as a default Genus or Specie).</p>
     <p>B. The grouping methods (we propose as a default sub-PCA).</p>
     <p>C. Normalization log or relative (we propose log as a default). If using log, one must put a minimal value
       (epsilon, we propose epsilon = 0.1).</p>
     <p>D. Z scoring on either rows or columns or both. This has a limited effect on the results.</p>
-    <p>E. Dimension reduction ICA/PCA or None (we propose as a default none).</p>
-    <p>When choosing dimension reduction in PCA or ICA, one must choose the number of dimensions.</p>
+    <p>E. Dimension reduction ICA/PCA or None (we propose as a default none).<br>When choosing dimension reduction in PCA or ICA, one must choose the number of dimensions.</p>
     <p>F. Normalization Log/Relative (we propose as a default Log).</p>
     <p>G. Z Scoring following relative frequency No/Yes (we propose as a default No).</p>
     <p>H. The taxonomy level used for the relative frequency plot (we propose class as a default)</p>
-    <p>The output will contains visualizations of the results, as well as a preprocessed file.</p>
+    <p>I. The metric for the Alpha diversity calculation (we suggest Shannon as a default).</p>
+    <p>J. The metric for the Beta diversity calculation (we suggest Bray-Curtis as a default,<br> since Unifrac can be a bit slow).</p>
+    <p>The output will contain visualizations of the results, as well as a preprocessed file.</p>
     <p>Here is an example of running:</p>
     <p>Step 1: Download the example input files and enter each to his fit place:
     <button>
@@ -22,11 +23,11 @@
     </button>
     </p>
     <p>Step 2: Choose the running options like these in the below image:</p>
-    <img src="static/example_input_options_2.png" width=40% border="1px">
+    <img src="static/example_input_options_3.png" width=30% border="1px">
     <p>Step 3: Click the "calculate" button and after the run will finish (it could take around 20-40 seconds)
       the output plots will appear, and you will be able to download them with the "download" button.
      The output plots should look like this:</p>
-    <p><img src="static/empty_pic_menu.png" width="=20%" border="1px"></p>
+    <p><img src="static/example_empty_pic_menu.png" width="=20%" border="1px"></p>
     <p>You may now choose the plot that you would like to view:</p>
     <p>First figure is a heatmap of the  correlation between the merged taxonomies.</p>
     <p>Second figure is a heatmap of the  correlation between samples.</p>
@@ -37,7 +38,7 @@
     <p>Seventh only appears when a tag file is given and it represents the correlation between the grouped taxonomies and the tag.
     <br>If a tag file is not given, it Will tell you that no tag file is given, and you may add  a tag file and calculate. After that, the figure will appear.</p>
     <p>After you've chosen your plot, it should look like this:</p>
-    <p><img src="static/pic_menu.png" width="40%" border="1px"></p>
+    <p><img src="static/pic_menu_example.png" width="40%" border="1px"></p>
   </header>
 </section>
 {% endblock %}
