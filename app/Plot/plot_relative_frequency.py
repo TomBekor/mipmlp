@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from  mipmlp.app import preprocess_grid
+import preprocess_grid
 
 def plot_rel_freq(data_frame, taxonomy_col="taxonomy", tax_level=3, folder=None):
         taxonomy_reduced = data_frame[taxonomy_col].map(lambda x: x.split(';'))

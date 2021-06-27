@@ -165,6 +165,28 @@
 
     <br>
 
+    <div>
+      <label for="alpha_div">Alpha diversity metric</label>
+      <select name="alpha_div" id="alpha_div">
+        {{ build_option('Shannon', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Observed OTUs', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Chao1', taxonomy_level_for_frequency_plot) }}
+      </select>
+    </div>
+
+    <br>
+
+    <div>
+      <label for="beta_div">Beta diversity metric</label>
+      <select name="beta_div" id="beta_div">
+        {{ build_option('Bray-Curtis', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Unwieghted unifrac', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Weighted unifrac', taxonomy_level_for_frequency_plot) }}
+      </select>
+    </div>
+
+    <br>
+
     <input type="submit" value="calculate" onclick="calculating();">
   </form>
 
