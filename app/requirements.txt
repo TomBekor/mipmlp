@@ -8,3 +8,4 @@ scikit-learn~=0.22.1
 seaborn~=0.10.0
 biom-format~=2.1.10
 networkx~=2.5.1
+scikit-bio~=0.5.6
