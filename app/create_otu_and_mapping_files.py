@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from preprocess_grid import preprocess_data
 from plot_rho import draw_X_y_rhos_calculation_figure
-from plot_3D_pca import PCA_t_test, plot_data_3d, plot_data_2d
+from plot_3D import PCA_t_test, plot_data_3d, plot_data_2d
 
 
 class CreateOtuAndMappingFiles(object):

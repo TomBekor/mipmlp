@@ -96,6 +96,17 @@
     <br>
 
     <div>
+      <label for="taxonomy_level_for_frequency_plot">Taxonomy Level For Frequency Plot</label>
+      <select name="taxonomy_level_for_frequency_plot" id="taxonomy_level_for_frequency_plot">
+        {{ build_option('Class', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Phylum', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Order', taxonomy_level_for_frequency_plot) }}
+      </select>
+    </div>
+
+    <br>
+
+    <div>
       <label for="epsilon">Epsilon</label>
       {% if epsilon is not defined %}
         {% set epsilon = 0.1 %}
@@ -154,6 +165,28 @@
 
     <br>
 
+    <div>
+      <label for="alpha_div">Alpha diversity metric</label>
+      <select name="alpha_div" id="alpha_div">
+        {{ build_option('Shannon', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Observed OTUs', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Chao1', taxonomy_level_for_frequency_plot) }}
+      </select>
+    </div>
+
+    <br>
+
+    <div>
+      <label for="beta_div">Beta diversity metric</label>
+      <select name="beta_div" id="beta_div">
+        {{ build_option('Bray-Curtis', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Unwieghted unifrac', taxonomy_level_for_frequency_plot) }}
+        {{ build_option('Weighted unifrac', taxonomy_level_for_frequency_plot) }}
+      </select>
+    </div>
+
+    <br>
+
     <input type="submit" value="calculate" onclick="calculating();">
   </form>
 
@@ -205,8 +238,8 @@
   {% if images_names is defined %}
 
       <script>
-      remove_mes()
-      image_page()
+        remove_mes()
+        image_page()
       </script>
 
   {% endif %}
