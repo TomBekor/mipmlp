@@ -7,22 +7,24 @@ from sklearn import preprocessing
 import seaborn as sns
 from collections import Counter
 
-from plot_rho import draw_component_rhos_calculation_figure
-from distance_learning_func import distance_learning
+from Preprocess.distance_learning_func import distance_learning
 from sklearn.decomposition import PCA
 from sklearn.decomposition import FastICA
 
-from LearningMethods.CorrelationFramework import CorrelationFramework
-from Plot.plot_triple_corr import use_corr_framwork
+from LearningMethods.CorrelationFramework import use_corr_framwork
+from Plot import plot_relative_frequency
 
 
-def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
-    taxnomy_level = int(dict_params['taxonomy_level'])
+def preprocess_data(data, dict_params: dict, map_file, visualize_data=False):
+    taxonomy_level = int(dict_params['taxonomy_level'])
     preform_taxnomy_group = dict_params['taxnomy_group']
+    tax_level_plot = dict_params["tax_level_plot"]
     eps_for_zeros = float(dict_params['epsilon'])
     preform_norm = dict_params['normalization']
     preform_z_scoring = dict_params['z_scoring']
     relative_z = dict_params['norm_after_rel']
+    correlation_removal_threshold = dict_params.get('correlation_threshold', None)
+    rare_bacteria_threshold = dict_params.get('rare_bacteria_threshold', None)
     var_th_delete = float(dict_params['std_to_delete'])
     pca = dict_params['pca']
 
@@ -47,6 +49,8 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         indexes_of_non_zeros = data_frame_flatten != 0
         visualize_preproccess(data_frame_for_vis, indexes_of_non_zeros, 'Before Taxonomy group', [321, 322])
 
+        data_frame_for_vis = as_data_frame.copy()
+
     if preform_taxnomy_group != '':
         print('Perform taxonomy grouping...')
         # union taxonomy level by group level
@@ -56,7 +60,7 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         if preform_taxnomy_group == 'sub PCA':
             taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:]))
         else:
-            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:taxnomy_level]))
+            taxonomy_reduced = taxonomy_reduced.map(lambda x: ';'.join(x[:taxonomy_level]))
         as_data_frame[taxonomy_col] = taxonomy_reduced
         # group by mean
         if preform_taxnomy_group == 'mean':
@@ -83,6 +87,10 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         except:
             pass
 
+    # remove highly correlated bacteria
+    if correlation_removal_threshold is not None:
+        as_data_frame = dropHighCorr(as_data_frame, correlation_removal_threshold)
+
     if visualize_data:
         data_frame_flatten = as_data_frame.values.flatten()
         indexes_of_non_zeros = data_frame_flatten != 0
@@ -91,10 +99,12 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         plt.figure('Density of samples')
         samples_density.hist(bins=100, facecolor='Blue')
         plt.title(f'Density of samples')
-        plt.savefig(os.path.join(folder, "density_of_samples.svg"), bbox_inches='tight', format='svg')
+        plt.savefig(os.path.join(folder, "density_of_samples.png"), bbox_inches='tight', format='svg')
+        plt.clf()
 
     # drop bacterias with single values
-    as_data_frame = drop_rare_bacteria(as_data_frame)
+    if rare_bacteria_threshold is not None:
+        as_data_frame = drop_rare_bacteria(as_data_frame, rare_bacteria_threshold)
 
     if preform_norm == 'log':
         print('Perform log normalization...')
@@ -111,10 +121,13 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
             plt.title(
                 f'Histogram of samples variance before z-scoring\nmean={samples_variance.values.mean()},'
                 f' std={samples_variance.values.std()}')
-            plt.savefig(os.path.join(folder, "samples_variance.svg"), bbox_inches='tight', format='svg')
+            plt.savefig(os.path.join(folder, "samples_variance.png"), bbox_inches='tight', format='svg')
+            plt.clf()
 
         if preform_z_scoring != 'No':
             as_data_frame = z_score(as_data_frame, preform_z_scoring)
+
+
     elif preform_norm == 'relative':
         print('Perform relative normalization...')
         as_data_frame = row_normalization(as_data_frame)
@@ -122,42 +135,50 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
             as_data_frame = z_score(as_data_frame, 'col')
 
     if visualize_data:
+        plt.clf()
+        plot_relative_frequency.plot_rel_freq(data_frame_for_vis, taxonomy_col, tax_level_plot, "static")
+
+    if visualize_data and False:
         data_frame_flatten = as_data_frame.values.flatten()
         indexes_of_non_zeros = data_frame_flatten != 0
         plt.figure('Preprocess')
         visualize_preproccess(as_data_frame, indexes_of_non_zeros, 'After-Taxonomy - After', [325, 326])
         plt.subplots_adjust(hspace=0.5, wspace=0.5)
         plt.savefig(os.path.join(folder, "preprocess.svg"), bbox_inches='tight', format='svg')
+        plt.clf()
+
     if visualize_data:
         plt.figure('standard heatmap')
         sns.heatmap(as_data_frame, cmap="Blues", xticklabels=False, yticklabels=False)
-        plt.title('Heatmap after standardization and taxonomy group level ' + str(taxnomy_level))
+        plt.title('Heatmap after standardization and taxonomy group level ' + str(taxonomy_level))
         plt.savefig(os.path.join(folder, "standard_heatmap.png"))
+        plt.clf()
         corr_method = 'pearson'
         corr_name = 'Pearson'
         # if samples on both axis needed, specify the vmin, vmax and mathod
         plt.figure('correlation heatmap patient')
         sns.heatmap(as_data_frame.T.corr(method=corr_method), cmap='Blues', vmin=-1, vmax=1, xticklabels=False,
                     yticklabels=False)
-        plt.title(corr_name + ' correlation patient with taxonomy level ' + str(taxnomy_level))
+        plt.title(corr_name + ' correlation patient with taxonomy level ' + str(taxonomy_level))
         # plt.savefig(os.path.join(folder, "correlation_heatmap_patient.svg"), bbox_inches='tight', format='svg')
         plt.savefig(os.path.join(folder, "correlation_heatmap_patient.png"))
+        plt.clf()
 
         plt.figure('correlation heatmap bacteria')
         sns.heatmap(as_data_frame.corr(method=corr_method), cmap='Blues', vmin=-1, vmax=1, xticklabels=False,
                     yticklabels=False)
-        plt.title(corr_name + ' correlation bacteria with taxonomy level ' + str(taxnomy_level))
+        plt.title(corr_name + ' correlation bacteria with taxonomy level ' + str(taxonomy_level))
         # plt.savefig(os.path.join(folder, "correlation_heatmap_bacteria.svg"), bbox_inches='tight', format='svg')
         plt.savefig(os.path.join(folder, "correlation_heatmap_bacteria.png"))
         # plt.show()
-        plt.close()
         plt.clf()
+        plt.close()
 
     as_data_frame_b_pca = as_data_frame.copy()
     bacteria = as_data_frame.columns
 
     if preform_taxnomy_group == 'sub PCA':
-        as_data_frame, _ = distance_learning(perform_distance=True, level=taxnomy_level,
+        as_data_frame, _ = distance_learning(perform_distance=True, level=taxonomy_level,
                                              preproccessed_data=as_data_frame, mapping_file=map_file)
         as_data_frame_b_pca = as_data_frame
 
@@ -166,7 +187,6 @@ def preprocess_data(data, dict_params, map_file=None, visualize_data=False):
         map_file = pd.to_numeric(map_file.squeeze(), errors='coerce').fillna(0)
         use_corr_framwork(as_data_frame, map_file,
                           title="Correlation_between_each_component_and_the_label_prognosis_task", folder=folder)
-
 
     if pca[0] != 0:
         print('perform ' + pca[1] + ' ...')
@@ -184,6 +204,7 @@ def visualize_preproccess(as_data_frame, indexes_of_non_zeros, name, subplot_idx
     result = data_frame_flatten[indexes_of_non_zeros]
     plt.subplot(subplot_idx[1])
     plot_preprocess_stage(result, name + ' without zeros')
+    plt.clf()
 
 
 def plot_preprocess_stage(result, name, write_title=False, write_axis=True):
@@ -245,7 +266,17 @@ def drop_bacteria(as_data_frame):
     return as_data_frame.drop(columns=bacterias_to_dump)
 
 
-def drop_rare_bacteria(as_data_frame):
+def dropHighCorr(data, threshold):
+    corr = data.corr()
+    df_not_correlated = ~(corr.mask(np.tril(np.ones([len(corr)] * 2, dtype=bool))).abs() > threshold).any()
+    un_corr_idx = df_not_correlated.loc[df_not_correlated[df_not_correlated.index] == True].index
+    df_out = data[un_corr_idx]
+    number_of_bacteria_dropped = len(data.columns) - len(df_out.columns)
+    print('{} bacteria were dropped due to high correlation with other columns'.format(number_of_bacteria_dropped))
+    return df_out
+
+
+def drop_rare_bacteria(as_data_frame, threshold):
     bact_to_num_of_non_zeros_values_map = {}
     bacteria = as_data_frame.columns
     num_of_samples = len(as_data_frame.index) - 1
@@ -262,10 +293,10 @@ def drop_rare_bacteria(as_data_frame):
 
     rare_bacteria = []
     for key, val in bact_to_num_of_non_zeros_values_map.items():
-        if val < 5:
+        if val < threshold:
             rare_bacteria.append(key)
     as_data_frame.drop(columns=rare_bacteria, inplace=True)
-    print(str(len(rare_bacteria)) + " bacteria with less then 5 non-zero value: ")
+    print("{} bacteria with less then {} non-zero value: ".format(len(rare_bacteria), threshold))
     return as_data_frame
 
 
@@ -326,3 +357,17 @@ def fill_taxonomy(as_data_frame, tax_col):
                              df_tax[5] + ';' + df_tax[6]
 
     return as_data_frame
+
+
+def from_biom(biom_file_path, taxonomy_file_path, otu_dest_path, **kwargs):
+    # Load the biom table and rename index.
+    from biom import load_table
+    otu_table = load_table(biom_file_path).to_dataframe(True)
+    # Load the taxonomy file and extract the taxonomy column.
+    taxonomy = pd.read_csv(taxonomy_file_path, index_col=0, sep=None, **kwargs).drop('Confidence', axis=1,
+                                                                                     errors='ignore')
+    otu_table = pd.merge(otu_table, taxonomy, right_index=True, left_index=True)
+    otu_table.rename({'Taxon': 'taxonomy'}, inplace=True, axis=1)
+    otu_table = otu_table.transpose()
+    otu_table.index.name = 'ID'
+    otu_table.to_csv(otu_dest_path)
