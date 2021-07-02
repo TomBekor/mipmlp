@@ -33,7 +33,7 @@
 
      <br>
     <button>
-      <a href="/download-outputs">download graphs and files</a>
+      <a href="/download-outputs">download graphs</a>
     </button>
     <br><br>
     <div>
@@ -45,8 +45,6 @@
             {{ build_option('Heatmap after standardization', choose_graph) }}
             {{ build_option('Histogram of samples variance', choose_graph) }}
             {{ build_option('Density of samples', choose_graph) }}
-            {{ build_option('Relative frequency stacked', choose_graph) }}
-            {{ build_option('Beta Diversity PCOA', choose_graph) }}
             {{ build_option('Correlation between component and label', choose_graph) }}
       </select>
     </div>
@@ -57,8 +55,7 @@
     <script>
         function show_graph() {
             const dict = {'Pearson correlation bacteria': 0, 'Pearson correlation patient': 1, 'Heatmap after standardization': 2,
-                'Histogram of samples variance': 3, 'Density of samples': 4,'Relative frequency stacked': 5 ,
-                'Beta Diversity PCOA':6, 'Correlation between component and label': 7};
+                'Histogram of samples variance': 3, 'Density of samples': 4, 'Correlation between component and label': 5};
             const input = document.getElementById("choose_graph");
             const name = input.options[input.selectedIndex].value;
             const data = {{ images_names|safe }}

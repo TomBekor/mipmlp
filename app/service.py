@@ -1,8 +1,5 @@
 import sys, os
-import pandas as pd
-
 from create_otu_and_mapping_files import CreateOtuAndMappingFiles
-from diversity import Diversity
 
 preprocess_prms = {'taxonomy_level': 6, 'taxnomy_group': 'sub PCA', 'epsilon': 0.1,
                    'normalization': 'log', 'z_scoring': 'row', 'norm_after_rel': 'No',
@@ -24,10 +21,6 @@ def evaluate(params, tag_flag):
     else:
         mapping_file = CreateOtuAndMappingFiles("OTU.csv", "TAG.csv")
     mapping_file.preprocess(preprocess_params=params, visualize=True)
-
-    diversity = Diversity("OTU.csv")
-    diversity.plot_beta(params["beta_div"], folder="static").to_csv("Mucositis\\beta_div.csv")
-    diversity.compute_alpha(params["alpha_div"]).to_csv("Mucositis\\alpha_div.csv")
     # mapping_file.rhos_and_pca_calculation(main_task, preprocess_prms['taxonomy_level'], preprocess_prms['pca'],
     # rhos_folder, pca_folder)
     if not tag_flag:
