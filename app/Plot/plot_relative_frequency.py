@@ -31,6 +31,15 @@ def plotting_with_pd(df: pd.DataFrame, folder=None, taxonomy_level=3):
     plt.savefig(f"{folder}/relative_frequency_stacked.png")
 
 def easy_otu_name(df):
-    df.columns = [str([h[4:].capitalize() for h in i.split(";")][-2:])
-                    .replace("[", "").replace("]", "").replace("\'", "") for i in df.columns]
+    columns = []
+    for i in df.columns:
+        list = []
+        for h in i.split(";"):
+            h=h.lstrip(" kpcofgs")
+            h=h.lstrip(" _")
+            h=h.capitalize()
+            list.append(h)
+        name = str(list[-2:]).replace("[", "").replace("]", "").replace("\'", "")
+        columns.append(name)
+    df.columns = columns
     return df
