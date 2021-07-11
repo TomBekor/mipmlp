@@ -31,7 +31,7 @@ def preprocess_data(data, dict_params: dict, map_file, visualize_data=False):
     taxonomy_col = 'taxonomy'
 
     as_data_frame = pd.DataFrame(data.T).apply(pd.to_numeric, errors='ignore').copy()  # data frame of OTUs
-
+    as_data_frame = as_data_frame.dropna()
     # fill all taxonomy level with default values
     as_data_frame = fill_taxonomy(as_data_frame, tax_col=taxonomy_col)
 
@@ -99,7 +99,7 @@ def preprocess_data(data, dict_params: dict, map_file, visualize_data=False):
         plt.figure('Density of samples')
         samples_density.hist(bins=100, facecolor='Blue')
         plt.title(f'Density of samples')
-        plt.savefig(os.path.join(folder, "density_of_samples.png"), bbox_inches='tight', format='svg')
+        plt.savefig(os.path.join(folder, "density_of_samples.svg"), bbox_inches='tight', format="svg")
         plt.clf()
 
     # drop bacterias with single values
@@ -121,7 +121,7 @@ def preprocess_data(data, dict_params: dict, map_file, visualize_data=False):
             plt.title(
                 f'Histogram of samples variance before z-scoring\nmean={samples_variance.values.mean()},'
                 f' std={samples_variance.values.std()}')
-            plt.savefig(os.path.join(folder, "samples_variance.png"), bbox_inches='tight', format='svg')
+            plt.savefig(os.path.join(folder, "samples_variance.svg"), bbox_inches='tight', format='svg')
             plt.clf()
 
         if preform_z_scoring != 'No':
@@ -345,17 +345,24 @@ def apply_pca(data, n_components=15, dim_red_type='PCA', visualize=False):
 
 def fill_taxonomy(as_data_frame, tax_col):
     df_tax = as_data_frame[tax_col].str.split(';', expand=True)
-    df_tax[6] = df_tax[6].fillna('s__')
-    df_tax[5] = df_tax[5].fillna('g__')
-    df_tax[4] = df_tax[4].fillna('f__')
-    df_tax[3] = df_tax[3].fillna('o__')
-    df_tax[2] = df_tax[2].fillna('c__')
-    df_tax[1] = df_tax[1].fillna('p__')
-    df_tax[0] = df_tax[0].fillna('s__')
+    df_tax[6] = df_tax[6].fillna('')
+    df_tax[6].replace(' s__', '', inplace=True)
+    df_tax[5] = df_tax[5].fillna('')
+    df_tax[5].replace(' g__', '', inplace=True)
+    df_tax[4] = df_tax[4].fillna('')
+    df_tax[4].replace(' f__', '', inplace=True)
+    df_tax[3] = df_tax[3].fillna('')
+    df_tax[3].replace(' o__', '', inplace=True)
+    df_tax[2] = df_tax[2].fillna('')
+    df_tax[2].replace(' c__', '', inplace=True)
+    df_tax[1] = df_tax[1].fillna('')
+    df_tax[1].replace(' p__', '', inplace=True)
+    df_tax[0] = df_tax[0].fillna('')
+    df_tax[0].replace(' k__', '', inplace=True)
 
     as_data_frame[tax_col] = df_tax[0] + ';' + df_tax[1] + ';' + df_tax[2] + ';' + df_tax[3] + ';' + df_tax[4] + ';' + \
                              df_tax[5] + ';' + df_tax[6]
-
+    as_data_frame[tax_col] = as_data_frame[tax_col].apply(lambda x: x.strip(";"))
     return as_data_frame
 
 

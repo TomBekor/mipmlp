@@ -8,7 +8,7 @@ from biom import load_table
 import json
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, send_file
+    Blueprint, flash, g, redirect, render_template, request, session, url_for, send_file, jsonify
 )
 
 bp = Blueprint('/', __name__, url_prefix='/')
@@ -94,8 +94,8 @@ def home_page():
                 STATIC_PATH + 'correlation_heatmap_bacteria.png',
                 STATIC_PATH + 'correlation_heatmap_patient.png',
                 STATIC_PATH + 'standard_heatmap.png',
-                STATIC_PATH + 'samples_variance.png',
-                STATIC_PATH + 'density_of_samples.png',
+                STATIC_PATH + 'samples_variance.svg',
+                STATIC_PATH + 'density_of_samples.svg',
                 STATIC_PATH + 'relative_frequency_stacked.png',
                 STATIC_PATH + 'beta_diversity.png'
             ]
@@ -159,25 +159,32 @@ def about_page():
 def results_page():
     images_names = None
     is_tag = False
-    path = STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.svg'
-    if os.stat("templates/im_name.txt").st_size != 0:
-        with open("templates/im_name.txt", "r") as f:
-            images_names = json.loads(f.read())
-    if request.method == 'POST':
-        tag_file = request.files['tag_file']
-        tag_file.save("TAG.csv")
-        with open("templates/params.txt", "r") as f:
-            params = json.loads(f.read())
-        if tag_file or os.path.exists(path):
-            is_tag = True
-            service.evaluate(params, False)
-    if type(images_names) == list:
-        if len(images_names) < 8:
-            images_names.append("")
-        images_names[7] = path
+    ip = request.environ['REMOTE_ADDR']
+    with open("static/IPs.txt", "r") as f:
+        if f.read() == ip or f.read() == '':
+            path = STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.svg'
+            if os.stat("templates/im_name.txt").st_size != 0:
+                with open("templates/im_name.txt", "r") as f:
+                    images_names = json.loads(f.read())
+            if request.method == 'POST':
+                tag_file = request.files['tag_file']
+                tag_file.save("TAG.csv")
+                with open("templates/params.txt", "r") as f:
+                    params = json.loads(f.read())
+                if tag_file or os.path.exists(path):
+                    is_tag = True
+                    service.evaluate(params, False)
+            if type(images_names) == list:
+                if len(images_names) < 8:
+                    images_names.append("")
+                images_names[7] = path
+    with open("static/IPs.txt", "w") as f:
+        f.write(ip)
     return render_template('images.html', active='Results', images_names=images_names, is_tag=is_tag)
 
-
+@bp.route("/get_my_ip", methods=["GET"])
+def get_my_ip():
+    return jsonify({'ip': request.remote_addr}), 200
 
 @bp.route('/download-outputs')
 def download():

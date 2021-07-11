@@ -16,7 +16,7 @@ class Diversity(object):
         otu_df = mapping_file.otu_features_df.copy()
         self.sample_ids = otu_df.index[:-1]
         self.otu_ids = otu_df.iloc[[-1]]
-        self.otu_df = otu_df.iloc[:-1]
+        self.otu_df = otu_df.iloc[:-1].dropna(axis=1)
 
 
     def compute_beta(self, metric="unweighted_unifrac"):
