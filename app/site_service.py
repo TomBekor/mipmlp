@@ -70,14 +70,14 @@ def home_page():
                 tag_file.save("TAG.csv")
             params = params_dict(taxonomy_level, taxnomy_group, tax_level_plot, epsilon, z_scoring, PCA, int(comp), normalization,
                                  norm_after_rel, alpha_div, beta_div)
-            with open("templates/params.txt", "w") as f:
+            with open("static/params.txt", "w") as f:
                 f.truncate(0)
                 f.write(json.dumps(params))
             service.evaluate(params, tag_flag)
             # create a ZipFile object
             with ZipFile('sampleDir.zip', 'w') as zipObj:
                 # Iterate over all the files in directory
-                for folderName, subfolders, filenames in os.walk("Mucositis"):
+                for folderName, subfolders, filenames in os.walk("General_files"):
                     for filename in filenames:
                         # create complete filepath of file in directory
                         filePath = os.path.join(folderName, filename)
@@ -114,7 +114,7 @@ def home_page():
         if error:
             flash(error)
         if not error:
-            with open("templates/im_name.txt", "w") as f:
+            with open("static/im_name.txt", "w") as f:
                 f.truncate(0)
                 f.write(json.dumps(images_names))
             return render_template('home.html', active='Home', otu_table=otu_table, tag_file=tag_file,
@@ -162,25 +162,23 @@ def results_page():
     ip = request.environ['REMOTE_ADDR']
     with open("static/IPs.txt", "r") as f:
         if f.read() == ip or f.read() == '':
-            path = STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.svg'
-            if os.stat("templates/im_name.txt").st_size != 0:
-                with open("templates/im_name.txt", "r") as f:
-                    images_names = json.loads(f.read())
+            path = STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.png'
             if request.method == 'POST':
                 tag_file = request.files['tag_file']
                 tag_file.save("TAG.csv")
-                with open("templates/params.txt", "r") as f:
+                with open("static/params.txt", "r") as f:
                     params = json.loads(f.read())
-                if tag_file or os.path.exists(path):
-                    is_tag = True
                     service.evaluate(params, False)
+                    is_tag = True
+            if os.stat("static/im_name.txt").st_size != 0:
+                with open("static/im_name.txt", "r") as f:
+                    images_names = json.loads(f.read())
             if type(images_names) == list:
-                if len(images_names) < 8:
-                    images_names.append("")
-                images_names[7] = path
+                if is_tag:
+                    images_names.append(path)
     with open("static/IPs.txt", "w") as f:
         f.write(ip)
-    return render_template('images.html', active='Results', images_names=images_names, is_tag=is_tag)
+    return render_template('images.html', active='Results', images_names=images_names)
 
 @bp.route("/get_my_ip", methods=["GET"])
 def get_my_ip():

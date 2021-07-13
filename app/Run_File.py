@@ -5,9 +5,9 @@ preprocess_prms = {'taxonomy_level': 6, 'taxnomy_group': 'sub PCA', 'epsilon': 0
                      'normalization': 'log', 'z_scoring': 'row', 'norm_after_rel': 'No',
                      'std_to_delete': 0, 'pca': (0, 'PCA')}
 
-otu_file = 'Mucositis/Mucositis_OTU.csv'
-tag_file = 'Mucositis/Mucositis_Tag.csv'
-task_name = 'Mucositis'
+otu_file = 'General_files/OTU.csv'
+tag_file = 'General_files/Tag.csv'
+task_name = 'General_task'
 
 mapping_file = CreateOtuAndMappingFiles(otu_file, tag_file)
 mapping_file.preprocess(preprocess_params=preprocess_prms, visualize=True)

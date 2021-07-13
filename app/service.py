@@ -16,7 +16,7 @@ normalization: log, relative , norm_after_rel: No, relative
 
 # otu_file = sys.argv[1]
 # tag_file = sys.argv[2]
-# task_name = sys.argv[3] # Mucositis
+# task_name = sys.argv[3] # General_files
 
 def evaluate(params, tag_flag):
     if tag_flag:
@@ -26,16 +26,17 @@ def evaluate(params, tag_flag):
     mapping_file.preprocess(preprocess_params=params, visualize=True)
 
     diversity = Diversity("OTU.csv")
-    diversity.plot_beta(params["beta_div"], folder="static").to_csv("Mucositis\\beta_div.csv")
-    diversity.compute_alpha(params["alpha_div"]).to_csv("Mucositis\\alpha_div.csv")
+    diversity.plot_beta(params["beta_div"], folder="static").to_csv("General_files\\beta_div.csv")
+    diversity.compute_alpha(params["alpha_div"]).to_csv("General_files\\alpha_div.csv")
     # mapping_file.rhos_and_pca_calculation(main_task, preprocess_prms['taxonomy_level'], preprocess_prms['pca'],
     # rhos_folder, pca_folder)
     if not tag_flag:
-        otu_path, mapping_path, pca_path = mapping_file.csv_to_learn("Mucositis", os.path.join(os.getcwd(), "Mucositis"),
-                                                                 preprocess_prms['taxonomy_level'])
+        otu_path, mapping_path, pca_path = mapping_file.csv_to_learn("General_task", os.path.join(os.getcwd(),
+                                                                                                  "General_files"),
+                                                                     preprocess_prms['taxonomy_level'])
     else:
-        otu_path, pca_path = mapping_file.csv_to_learn("Mucositis", os.path.join(os.getcwd(), "Mucositis"),
-                                                                 preprocess_prms['taxonomy_level'])
+        otu_path, pca_path = mapping_file.csv_to_learn("General_task", os.path.join(os.getcwd(), "General_files"),
+                                                       preprocess_prms['taxonomy_level'])
     print('CSV files are ready after MIPMLP')
     print('OTU file', otu_path)
     if not tag_flag:
