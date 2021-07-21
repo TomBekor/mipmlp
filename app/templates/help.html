@@ -1,13 +1,16 @@
-{% extends 'base.html' %}
+{% extends 'new_base.html' %}
+
 
 {% block content %}
     <section class="content">
-      <header>
-        <p>MIPMLP is preprocessing tool for 16S values.</p>
-        <p>The input file should contain detailed unormalized OTU/Feature values as a biom table, and the appopriate taxonomy as a tsv file,</p>
-        <p>and a possible tag file, with the class of each sample. See Example page for the formal of the input files.</p>
-        <p>The tag file is not used for the preprocessing, but is used to provide some statistics on the relation between the features and the class.</p>
-        <p>One can run MIPMLP even without a tag file.</p>
-      </header>
+      <body>
+        <p class="with_margin">MIPMLP is preprocessing tool for 16S values.
+        <br>The input file should contain detailed unormalized OTU/Feature values as a biom table, and the appopriate taxonomy as a tsv file,
+        <br>and a possible tag file, with the class of each sample. See Example page for the formal of the input files.
+        <br>The tag file is not used for the preprocessing, but is used to provide some statistics on the relation between the features and the class.
+        <br>One can run MIPMLP even without a tag file.</p>
+      </body>
     </section>
+
 {% endblock %}
+

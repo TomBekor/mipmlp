@@ -29,7 +29,8 @@ def home_page():
         otu_csv = request.files['otu_csv']
         otu_table = request.files['otu_table']
         taxonomy_file = request.files['taxonomy_file']
-        tag_file = request.files['tag_file']
+        tag_file_csv = request.files['tag_file_csv']
+        tag_file_biom = request.files['tag_file_biom']
         taxonomy_level = request.form['taxonomy_level']
         taxnomy_group = request.form['taxnomy_group']
         tax_level_plot = request.form["taxonomy_level_for_frequency_plot"]
@@ -65,9 +66,16 @@ def home_page():
                 biom_to_otu(biom_path=table_path, taxonomy_path=taxonomy_path, otu_dest_path=otu_path)
 
             tag_flag = True
-            if tag_file:
+            if tag_file_csv or tag_file_biom:
                 tag_flag = False
-                tag_file.save("TAG.csv")
+                if tag_file_csv:
+                    tag_file_csv.save("TAG.csv")
+                    tag_file = tag_file_csv
+                else:
+                    tag_file_biom.save("TAG.csv")
+                    tag_file = tag_file_biom
+            else:
+                tag_file = None
             params = params_dict(taxonomy_level, taxnomy_group, tax_level_plot, epsilon, z_scoring, PCA, int(comp), normalization,
                                  norm_after_rel, alpha_div, beta_div)
             with open("static/params.txt", "w") as f:
@@ -159,6 +167,7 @@ def about_page():
 def results_page():
     images_names = None
     is_tag = False
+    tag_file=None
     ip = request.environ['REMOTE_ADDR']
     with open("static/IPs.txt", "r") as f:
         if f.read() == ip or f.read() == '':
@@ -178,7 +187,7 @@ def results_page():
                     images_names.append(path)
     with open("static/IPs.txt", "w") as f:
         f.write(ip)
-    return render_template('images.html', active='Results', images_names=images_names)
+    return render_template('images.html', active='Results', images_names=images_names, tag_file=tag_file)
 
 @bp.route("/get_my_ip", methods=["GET"])
 def get_my_ip():

@@ -1,0 +1,301 @@
+<!doctype html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<nav>
+    <style>
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #68a8e3;
+}
+
+li {
+  float: left;
+  /*border-left:1px solid #667878;*/
+
+}
+
+li:last-child {
+  border-right: none;
+}
+
+li a {
+  display: block;
+  color: #3e3e3e;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #3c6afc;
+  color: #000000;
+}
+
+body {
+    background-color: rgb(210, 233, 253);
+    font-family: "Lucida Sans Unicode", sans-serif;
+    font-size: large;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;
+}
+
+
+
+.myTitle {
+  position: relative;
+  text-align: center;
+  color: white;
+
+}
+
+.title_text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Lucida Sans Unicode", sans-serif;
+  font-size: 80px ;
+  text-shadow: 3px 3px #001b5e;
+}
+
+.large_with_margin{
+  margin-top: 50px;
+  margin-left: 50px;
+  font-size: 23px;
+}
+
+.with_margin{
+  margin-top: 50px;
+  margin-left: 50px;
+  line-height: 200%;
+}
+
+.with_part_margin{
+  margin-top: 20px;
+  margin-left: 50px;
+  line-height: 120%;
+}
+
+div#box{
+    width: 100%;
+}
+
+img#image {
+    float: right;
+}
+
+.central_box {
+    background-color: rgb(210, 233, 253);
+    width: 90%;
+    margin:0 auto;
+    border-radius: 8px;
+    padding: 5% 15%;
+    {#align-content: center;#}
+    {#align-items: center;#}
+}
+
+
+table
+{
+    align-self: center;
+    border-collapse: separate;
+    border-spacing: 0 30px;
+}
+
+td
+{
+    padding:0 50px;
+}
+
+HTML
+
+.site_form {
+    margin: auto;
+    width: 400px;
+    {#background-color: #A0FAB2;#}
+}
+
+.site_input {
+    font-size: 18px;
+    color: #000000;
+}
+
+.btn {
+    font-family: "Lucida Sans Unicode", sans-serif;
+    margin-left: 50px;
+}
+
+.btn2 {
+    font-family: "Lucida Sans Unicode", sans-serif;
+    margin-left: 0;
+}
+
+.submit_btn {
+    padding: 0.5% 7%;
+    font-size: 18px;
+    background-color: #5E84FF;
+    margin-left: 50px;
+}
+
+.download-button {
+    padding: 6px 6px;
+    font-size: 16px;
+    background-color: #CFE0E9;
+    border-radius: 2px;
+    border-color: white;
+    margin-left: 50px;
+}
+
+.download-link {
+    color: #000000;
+}
+
+.site_center {
+    text-align: center;
+}
+
+.big_text {
+    padding-left: 20px;
+}
+
+.output {
+    text-align: center;
+    margin: auto;
+}
+
+.active {
+  background-color: #000070;
+  color: #E5E5E5;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 47px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 13px;
+  width: 13px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+#Races_Table {
+    background-color: #d4e2e3;
+    text-align: center;
+}
+
+#Races_Table td{
+    text-align: center;
+}
+
+#Races_Table{
+    border-collapse:separate;
+    border-spacing:0 12px;
+}
+
+.race_table {
+    width: 1000px;
+}
+
+.race_table th{
+    background-color: #7e9df6;
+}
+
+.race_table td{
+    background-color: #e2e8e9;
+    height: 20px;
+}
+
+
+</style>
+
+    <body>
+
+  {% macro build_navbar_option(name) -%}
+    {% if name == 'About' %}
+      {% if active == 'About' %}
+        <li style="float:right"><a class="active" href="{{ '/' + name }}">About</a></li>
+      {% else %}
+        <li style="float:right"><a href="{{ '/' + name }}">About</a></li>
+      {% endif %}
+    {% else %}
+      {% if name == active %}
+        <li><a class="active" href="{{ '/' + name }}">{{ name }}</a></li>
+      {% else %}
+        <li><a href="{{ '/' + name }}">{{ name }}</a></li>
+      {% endif %}
+    {% endif %}
+  {%- endmacro %}
+
+<ul>
+  {{build_navbar_option('Home')}}
+  {{build_navbar_option('Help')}}
+  {{build_navbar_option('Example')}}
+  {{build_navbar_option('Results')}}
+  {{build_navbar_option('About')}}
+</ul>
+
+
+</body>
+</nav>
+<section class="content">
+  <header>
+    {% block header %}{% endblock %}
+  </header>
+  {% block content %}{% endblock %}
+</section>

@@ -1,9 +1,15 @@
-{% extends 'base.html' %}
+{% extends 'new_base.html' %}
+
+
 
 {% block content %}
-  <h1>MIPMLP</h1>
+<div class="myTitle">
+  <img src="static/mipmlp_title_example.jpg" alt="Title"  width="100%" height="140px">
+  <div class="title_text">MIP-MLP</div>
+</div>
+<!--<img src="static/mipmlp_title_example.png" width="2000px" height="200px" alt="Title">-->
 <section class="content">
-  <form method="post"  enctype=multipart/form-data class="">
+  <form class="central_box" method="post"  enctype=multipart/form-data class="">
     {% macro build_option(name, selected_att) -%}
     {% if name == selected_att %}
       <option value="{{ name }}" selected="selected">{{name}}</option>
@@ -18,6 +24,8 @@
         const otu_table = document.getElementById("otu_table_div");
         const taxonomy = document.getElementById("taxonomy_file_div");
         const otu_csv = document.getElementById("otu_csv_div");
+        const tag_biom = document.getElementById("tag_biom");
+        const tag_csv = document.getElementById("tag_csv");
 
         if (! biom) {
             document.getElementById("biom_button").style.backgroundColor='#FFFFFF'
@@ -25,76 +33,100 @@
             otu_table.style.display = "none";
             taxonomy.style.display = "none";
             otu_csv.style.display = "block";
+            tag_biom.style.display = "none";
+            tag_csv.style.display = "block";
+
         } else {
             document.getElementById("biom_button").style.background='#D4F9FF'
             document.getElementById("csv_button").style.background='#FFFFFF'
             otu_table.style.display = "block";
             taxonomy.style.display = "block";
             otu_csv.style.display = "none";
+            tag_biom.style.display = "block";
+            tag_csv.style.display = "none";
         }
     }
 
     </script>
 
-    <button id="biom_button" type="button" onclick="input_format_manager(true)">otu.biom and taxonomy.tsv</button>
-    <button id="csv_button" type="button" onclick="input_format_manager(false)">otu.csv with taxonomy included</button>
+    <button class="btn" id="biom_button" type="button" onclick="input_format_manager(true)">otu.biom and taxonomy.tsv</button>
+    <button class="btn2" id="csv_button" type="button" onclick="input_format_manager(false)">otu.csv with taxonomy included</button>
 
     <br>
-
     <br>
 
+
+    <table>
+    <tr>
+    <td>
     <div id="otu_csv_div">
-      <label for="otu_csv">Select OTU csv:</label>
+      <label for="otu_csv">Select OTU csv:<br></label>
       <input type=file id="otu_csv" name="otu_csv" value="{{otu_csv}}">
-      <br><br>
+
     </div>
 
     <div id="otu_table_div">
-      <label for="otu_table">Select OTU table:</label>
+      <label for="otu_table">Select OTU table:<br></label>
       <input type=file id="otu_table" name="otu_table" value="{{otu_table}}">
-        <br><br>
+
+    </div>
+    </td>
+
+    <td>
+    <div id="taxonomy_file_div">
+      <label for="taxonomy_file">Select taxonomy file:<br></label>
+      <input type=file id="taxonomy_file" name="taxonomy_file" value="{{taxonomy_file}}">
+
     </div>
 
-    <div id="taxonomy_file_div">
-      <label for="taxonomy_file">Select taxonomy file:</label>
-      <input type=file id="taxonomy_file" name="taxonomy_file" value="{{taxonomy_file}}">
-        <br><br>
+    <div id="tag_csv">
+      <label for="tag_file_csv">Select Tag file:<br></label>
+      <input type=file id="tag_file_csv" name="tag_file_csv" value="{{tag_file_csv}}">
     </div>
+    </td>
+
+
+
+    <td>
+    <div id="tag_biom">
+      <label for="tag_file_biom">Select Tag file:<br></label>
+      <input type=file id="tag_file_biom" name="tag_file_biom" value="{{tag_file_biom}}">
+    </div>
+    </td>
+    </tr>
 
     <script>
         input_format_manager(true)
     </script>
 
-    <div>
-      <label for="tag_file">Select Tag file:</label>
-      <input type=file id="tag_file" name="tag_file" value="{{tag_file}}">
-    </div>
 
-    <br>
-
-    <div>
-      <label for="taxonomy_level">Taxonomy Level</label>
+      <tr>
+      <td>
+      <div>
+      <label for="taxonomy_level">Taxonomy Level<br></label>
       <select name="taxonomy_level" id="taxonomy_level">
         {{ build_option('Order', taxonomy_level) }}
         {{ build_option('Family', taxonomy_level) }}
         {{ build_option('Genus', taxonomy_level) }}
         {{ build_option('Specie', taxonomy_level) }}
       </select>
-    </div>
+      </div>
+      </td>
 
-    <br>
 
-    <div>
-      <label for="taxnomy_group">Taxnomy Group</label>
+      <td>
+      <div>
+      <label for="taxnomy_group">Taxnomy Group<br></label>
       <select name="taxnomy_group" id="taxnomy_group">
         {{ build_option('Mean', taxnomy_group) }}
         {{ build_option('Sum', taxnomy_group) }}
         {{ build_option('Sub-PCA', taxnomy_group) }}
       </select>
     </div>
+    </td>
 
-    <br>
 
+    <td>
     <div>
       <label for="taxonomy_level_for_frequency_plot">Taxonomy Level For Frequency Plot</label>
       <select name="taxonomy_level_for_frequency_plot" id="taxonomy_level_for_frequency_plot">
@@ -103,22 +135,24 @@
         {{ build_option('Order', taxonomy_level_for_frequency_plot) }}
       </select>
     </div>
+    </td>
+    </tr>
 
-    <br>
 
+    <tr>
+    <td>
     <div>
-      <label for="epsilon">Epsilon</label>
+      <label for="epsilon">Epsilon<br></label>
       {% if epsilon is not defined %}
         {% set epsilon = 0.1 %}
       {% endif %}
-      <input type="number" min="0" max="1" step="any" name="epsilon" id="epsilon" value="{{epsilon}}">
-
+      <input type="number" min="0" max="1" style="width: 4em" step="any" name="epsilon" id="epsilon" value="{{epsilon}}">
     </div>
+    </td>
 
-    <br>
-
+    <td>
     <div>
-      <label for="z_scoring">Z Scoring following Log normalization</label>
+      <label for="z_scoring">Z Scoring following log normalization</label>
       <select name="z_scoring" id="z_scoring">
         {{ build_option('Row', z_scoring) }}
         {{ build_option('Column', z_scoring) }}
@@ -126,9 +160,10 @@
         {{ build_option('None', z_scoring) }}
       </select>
     </div>
+    </td>
 
-    <br>
 
+    <td>
     <div>
       <label for="PCA">Dimension reduction</label>
       <select name="PCA" id="PCA">
@@ -136,25 +171,29 @@
         {{ build_option('ICA', PCA) }}
         {{ build_option('None', PCA) }}
       </select>
-      <label for="comp">Number of components</label>
+      <label for="comp"><br>Number of components</label>
       {% if comp is not defined %}
         {% set comp = 1 %}
       {% endif %}
-      <input type="number" id="comp" name="comp" min="-1" step="1" value="{{comp}}" required>
+      <input type="number" id="comp" name="comp" style="width: 4em" min="-1" step="1" value="{{comp}}" required>
     </div>
+    </td>
+    </tr>
 
-    <br>
 
+    <tr>
+    <td>
     <div>
-      <label for="normalization">Normalization</label>
+      <label for="normalization">Normalization<br></label>
       <select name="normalization" id="normalization">
         {{ build_option('Log', normalization) }}
         {{ build_option('Relative', normalization) }}
       </select>
     </div>
+    </td>
 
-    <br>
 
+    <td>
     <div>
       <label for="norm_after_rel">Z Scoring following relative frequency</label>
       <select name="norm_after_rel" id="norm_after_rel">
@@ -162,41 +201,45 @@
         {{ build_option('Yes', norm_after_rel) }}
       </select>
     </div>
+    </td>
 
-    <br>
-
+    <td>
     <div>
-      <label for="alpha_div">Alpha diversity metric</label>
+      <label for="alpha_div">Alpha diversity metric<br></label>
       <select name="alpha_div" id="alpha_div">
         {{ build_option('Shannon', taxonomy_level_for_frequency_plot) }}
         {{ build_option('Observed OTUs', taxonomy_level_for_frequency_plot) }}
         {{ build_option('Chao1', taxonomy_level_for_frequency_plot) }}
       </select>
     </div>
+    </td>
+    </tr>
 
-    <br>
-
+    <tr>
+    <td></td>
+    <td>
     <div>
-      <label for="beta_div">Beta diversity metric</label>
+      <label for="beta_div">Beta diversity metric<br></label>
       <select name="beta_div" id="beta_div">
         {{ build_option('Bray-Curtis', taxonomy_level_for_frequency_plot) }}
         {{ build_option('Unwieghted unifrac', taxonomy_level_for_frequency_plot) }}
         {{ build_option('Weighted unifrac', taxonomy_level_for_frequency_plot) }}
       </select>
     </div>
-
+    </td>
+    </tr>
+    </table>
     <br>
 
-    <input type="submit" value="calculate" onclick="calculating();">
-  </form>
-
-    {% for message in get_flashed_messages() %}
+    <input class="submit_btn" type="submit" value="calculate" onclick="calculating();">
+        {% for message in get_flashed_messages() %}
 {#    {% if message == "The number of components should be -1 or positive integer (not 0)." %}#}
-    <p style="color: firebrick">{{ message }}</p>
+    <p style="color: firebrick" class="with_part_margin">{{ message }}</p>
 {#    {% endif %}#}
     {% endfor %}
+    <p class="with_part_margin" id="txt_mes" ></p>
+  </form>
 
-    <p id="txt_mes" ></p>
 
     <script>
 
@@ -232,6 +275,10 @@
     clear: both;
     display: table;
   }
+
+  body {
+    background-color: rgb(244, 251, 253);
+}
   </style>
 
 
