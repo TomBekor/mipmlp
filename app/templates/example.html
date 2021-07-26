@@ -1,44 +1,73 @@
-{% extends 'base.html' %}
+{% extends 'new_base.html' %}
 
 {% block content %}
 <section class="content">
   <header>
-    <p>When performing MIP-MLP, one has to select ten choices:</p>
-    <p>A. The taxonomy level used (we propose as a default Genus or Specie).</p>
-    <p>B. The grouping methods (we propose as a default sub-PCA).</p>
-    <p>C. Normalization log or relative (we propose log as a default). If using log, one must put a minimal value
-      (epsilon, we propose epsilon = 0.1).</p>
-    <p>D. Z scoring on either rows or columns or both. This has a limited effect on the results.</p>
-    <p>E. Dimension reduction ICA/PCA or None (we propose as a default none).<br>When choosing dimension reduction in PCA or ICA, one must choose the number of dimensions.</p>
-    <p>F. Normalization Log/Relative (we propose as a default Log).</p>
-    <p>G. Z Scoring following relative frequency No/Yes (we propose as a default No).</p>
-    <p>H. The taxonomy level used for the relative frequency plot (we propose class as a default)</p>
-    <p>I. The metric for the Alpha diversity calculation (we suggest Shannon as a default).</p>
-    <p>J. The metric for the Beta diversity calculation (we suggest Bray-Curtis as a default,<br> since Unifrac can be a bit slow).</p>
-    <p>The output will contain visualizations of the results, as well as a preprocessed file.</p>
-    <p>Here is an example of running:</p>
-    <p>Step 1: Download the example input files and enter each to his fit place:
+    <div id="box">
+    <span id="content">
+    <table>
+      <tr>
+        <td>
+    <p class="with_margin">When performing MIP-MLP, one has to select ten choices:
+    <br>A. The taxonomy level used (we propose as a default Genus or Specie).
+    <br>B. The grouping methods (we propose as a default sub-PCA).
+    <br>C. Normalization log or relative (we propose log as a default). If using log, one must put a minimal value
+    <br>(epsilon, we propose epsilon = 0.1).
+    <br>D. Z scoring on either rows or columns or both. This has a limited effect on the results.
+    <br>E. Dimension reduction ICA/PCA or None (we propose as a default none).<br>When choosing dimension reduction in PCA or ICA, one must choose the number of dimensions.
+    <br>F. Normalization Log/Relative (we propose as a default Log).
+    <br>G. Z Scoring following relative frequency No/Yes (we propose as a default No).
+    <br>H. The taxonomy level used for the relative frequency plot (we propose class as a default)
+    <br>I. The metric for the Alpha diversity calculation (we suggest Shannon as a default).
+    <br>J. The metric for the Beta diversity calculation (we suggest Bray-Curtis as a default,<br> since Unifrac can be a bit slow).
+    <br>The output will contain visualizations of the results, as well as a preprocessed file.
+    <br><br>Here is an example of running:
+    <br>Step 1: Download the example input files and enter each to his fit place:
     <button>
     <a href="/download-example-files">download</a>
     </button>
     </p>
-    <p>Step 2: Choose the running options like these in the below image:</p>
-    <img src="static/example_input_options_3.png" width=30% border="1px">
-    <p>Step 3: Click the "calculate" button and after the run will finish (it could take around 20-40 seconds)
-      the output plots will appear, and you will be able to download them with the "download" button.
-     The output plots should look like this:</p>
-    <p><img src="static/example_empty_pic_menu.png" width="=20%" border="1px"></p>
-    <p>You may now choose the plot that you would like to view:</p>
-    <p>First figure is a heatmap of the  correlation between the merged taxonomies.</p>
-    <p>Second figure is a heatmap of the  correlation between samples.</p>
-    <p>Third figure is a heatmap of the normalized samples.</p>
-    <p>Fourth figure is a histogram of the variance of samples. Samples with very low variance should probably be removed.</p>
-    <p>Fifth figure is a histogram of the total number of reads per sample. Samples with very low total number of reads should probably be removed.</p>
-    <p>Sixth figure is a plot of the prevalence of each taxonomic unit (Phylum, Class, Order) in each person.</p>
-    <p>Seventh only appears when a tag file is given and it represents the correlation between the grouped taxonomies and the tag.
-    <br>If a tag file is not given, it Will tell you that no tag file is given, and you may add  a tag file and calculate. After that, the figure will appear.</p>
-    <p>After you've chosen your plot, it should look like this:</p>
-    <p><img src="static/pic_menu_example.png" width="40%" border="1px"></p>
+    <p class="with_margin">Step 2: Choose the running options like those in the image:</p>
+      </td>
+      <td>
+    <img src="static/example_input_options_3.png" width="80%" border="1px">
+      </td>
+      </tr>
+      <tr>
+        <td>
+    <p class="with_margin">Step 3: Click the "calculate" button and after the run will finish (it could take around 20-40 seconds)
+    <br>the output plots will appear, and you will be able to download them with the "download" button.
+    <br>The output plots should look like this:</p>
+        </td>
+        <td>
+    <p><img src="static/example_empty_pic_menu.png" width="50%" border="1px"></p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+    <p class="with_margin">You may now choose the plot that you would like to view:
+    <br>First figure is a heatmap of the  correlation between the merged taxonomies.
+    <br>Second figure is a heatmap of the  correlation between samples.
+    <br>Third figure is a heatmap of the normalized samples.
+    <br>Fourth figure is a histogram of the variance of samples.
+    <br> Samples with very low variance should probably be removed.
+    <br>Fifth figure is a histogram of the total number of reads per sample.
+    <br>Samples with very low total number of reads should probably be removed.
+    <br>Sixth figure is a plot of the prevalence of each taxonomic unit (Phylum, Class, Order) in each person.
+    <br>Seventh only appears when a tag file is given,
+    <br>and it represents the correlation between the grouped taxonomies and the tag.
+    <br>If a tag file is not given, it Will tell you that no tag file is given,
+    <br>and you may add a tag file and calculate. After that, the figure will appear.
+    <br>After you've chosen your plot, it should look like this:
+    </p>
+      </td>
+      <td>
+    <p><img src="static/pic_menu_example.png" width="80%" border="1px"></p>
+      </td>
+      </tr>
+    </table>
+    </span>
+    </div>
   </header>
 </section>
 {% endblock %}
