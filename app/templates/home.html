@@ -34,10 +34,10 @@
             otu_table.style.display = "none";
             taxonomy.style.display = "none";
             otu_csv.style.display = "inline-block";
-            otu_csv.style.marginLeft = "16em"
+            otu_csv.style.marginLeft = "17em"
             tag_biom.style.display = "none";
             tag_csv.style.display = "inline-block";
-            tag_csv.style.marginLeft = "14em"
+            tag_csv.style.marginLeft = "14.8em"
 
         } else {
             document.getElementById("biom_button").style.background='#D4F9FF'
@@ -45,10 +45,10 @@
             otu_table.style.display = "inline-block"
             otu_table.style.marginLeft = "7em"
             taxonomy.style.display = "inline-block";
-            taxonomy.style.marginLeft = "8em"
+            taxonomy.style.marginLeft = "5.5em"
             otu_csv.style.display = "none";
             tag_biom.style.display = "inline-block";
-            tag_biom.style.marginLeft = "12em"
+            tag_biom.style.marginLeft = "10em"
             tag_csv.style.display = "none";
         }
     }
@@ -56,8 +56,8 @@
     </script>
 
     <div class="input_box">
-    <button class="btn" id="biom_button" type="button" onclick="input_format_manager(true)">otu.biom and taxonomy.tsv</button>
-    <button class="btn2" id="csv_button" type="button" onclick="input_format_manager(false)">otu.csv with taxonomy included</button>
+    <button class="btn" id="biom_button" type="button" style="margin-left: 8em" onclick="input_format_manager(true)">otu.biom and taxonomy.tsv</button>
+    <button class="btn2" id="csv_button" type="button" style="margin-left: 0" onclick="input_format_manager(false)">otu.csv with taxonomy included</button>
 
     <br>
     <br>
@@ -99,10 +99,7 @@
     <br>
 
     <div class="central_box">
-      <table>
-      <tr>
-      <td>
-      <div>
+      <div style="display: inline-block; margin-left: 7em">
       <label for="taxonomy_level">Taxonomy Level<br></label>
       <select name="taxonomy_level" id="taxonomy_level">
         {{ build_option('Order', taxonomy_level) }}
@@ -111,11 +108,9 @@
         {{ build_option('Specie', taxonomy_level) }}
       </select>
       </div>
-      </td>
 
 
-      <td>
-      <div>
+      <div style="display: inline-block; margin-left: 11.6em">
       <label for="taxnomy_group">Taxnomy Group<br></label>
       <select name="taxnomy_group" id="taxnomy_group">
         {{ build_option('Mean', taxnomy_group) }}
@@ -123,11 +118,9 @@
         {{ build_option('Sub-PCA', taxnomy_group) }}
       </select>
     </div>
-    </td>
 
 
-    <td>
-    <div>
+    <div style="display: inline-block; margin-left: 16em">
       <label for="taxonomy_level_for_frequency_plot">Taxonomy Level For Frequency Plot<br></label>
       <select name="taxonomy_level_for_frequency_plot" id="taxonomy_level_for_frequency_plot">
         {{ build_option('Class', taxonomy_level_for_frequency_plot) }}
@@ -135,23 +128,19 @@
         {{ build_option('Order', taxonomy_level_for_frequency_plot) }}
       </select>
     </div>
-    </td>
-    </tr>
 
+    <br><br><br>
 
-    <tr>
-    <td>
-    <div>
+    <div style="display: inline-block; margin-left: 7em">
       <label for="epsilon">Epsilon<br></label>
       {% if epsilon is not defined %}
         {% set epsilon = 0.1 %}
       {% endif %}
       <input type="number" min="0" max="1" style="width: 4em" step="any" name="epsilon" id="epsilon" value="{{epsilon}}">
     </div>
-    </td>
 
-    <td>
-    <div>
+
+    <div style="display: inline-block; margin-left: 16em">
       <label for="z_scoring">Z Scoring following log normalization<br></label>
       <select name="z_scoring" id="z_scoring">
         {{ build_option('Row', z_scoring) }}
@@ -160,11 +149,9 @@
         {{ build_option('None', z_scoring) }}
       </select>
     </div>
-    </td>
 
 
-    <td>
-    <div>
+    <div style="display: inline-block; margin-left: 5.5em">
       <label for="PCA">Dimension reduction</label>
       <select name="PCA" id="PCA">
         {{ build_option('PCA', PCA) }}
@@ -177,34 +164,28 @@
       {% endif %}
       <input type="number" id="comp" name="comp" style="width: 4em" min="-1" step="1" value="{{comp}}" required>
     </div>
-    </td>
-    </tr>
 
+    <br><br><br>
 
-    <tr>
-    <td>
-    <div>
+    <div style="display: inline-block; margin-left: 7em">
       <label for="normalization">Normalization<br></label>
       <select name="normalization" id="normalization">
         {{ build_option('Log', normalization) }}
         {{ build_option('Relative', normalization) }}
       </select>
     </div>
-    </td>
 
 
-    <td>
-    <div>
+    <div style="display: inline-block; margin-left: 12.7em">
       <label for="norm_after_rel">Z Scoring following relative frequency<br></label>
       <select name="norm_after_rel" id="norm_after_rel">
         {{ build_option('No', norm_after_rel) }}
         {{ build_option('Yes', norm_after_rel) }}
       </select>
     </div>
-    </td>
 
-    <td>
-    <div>
+
+    <div style="display: inline-block; margin-left: 5.5em">
       <label for="alpha_div">Alpha diversity metric<br></label>
       <select name="alpha_div" id="alpha_div">
         {{ build_option('Shannon', taxonomy_level_for_frequency_plot) }}
@@ -212,13 +193,10 @@
         {{ build_option('Chao1', taxonomy_level_for_frequency_plot) }}
       </select>
     </div>
-    </td>
-    </tr>
 
-    <tr>
-    <td></td>
-    <td>
-    <div>
+    <br><br><br>
+
+    <div style="display: inline-block; margin-left: 27em">
       <label for="beta_div">Beta diversity metric<br></label>
       <select name="beta_div" id="beta_div">
         {{ build_option('Bray-Curtis', taxonomy_level_for_frequency_plot) }}
@@ -226,9 +204,6 @@
         {{ build_option('Weighted unifrac', taxonomy_level_for_frequency_plot) }}
       </select>
     </div>
-    </td>
-    </tr>
-    </table>
       </div>
     <br>
 
