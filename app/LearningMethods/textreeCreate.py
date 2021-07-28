@@ -7,7 +7,7 @@ import pickle
 
 
 """
-every bacteria is an object to easily store it's information
+every bacteria is an object to easily store its information
 """
 class Bacteria:
     def __init__(self, string, val):
@@ -61,4 +61,4 @@ def create_final_graph(tempGraph, valdict, flag):
     return graph
 
 if __name__ == "__main__":
-    create_tax_tree(pickle.load(open("series.p", "rb")))
+    create_tax_tree(pickle.load(open("graph152forAriel.p", "rb")), flag=0, keepFlagged=False)

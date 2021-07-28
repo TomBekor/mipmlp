@@ -65,20 +65,20 @@ body {
 }
 
 .large_with_margin{
-  margin-top: 50px;
-  margin-left: 50px;
+  margin-top: 3em;
+  margin-left: 3em;
   font-size: 23px;
 }
 
 .with_margin{
-  margin-top: 50px;
-  margin-left: 50px;
+  margin-top: 3em;
+  margin-left: 3em;
   line-height: 200%;
 }
 
 .with_part_margin{
-  margin-top: 20px;
-  margin-left: 50px;
+  margin-top: 1.2em;
+  margin-left: 3em;
   line-height: 120%;
 }
 
@@ -90,12 +90,25 @@ img#image {
     float: right;
 }
 
+.input_box {
+    background-color: rgb(68, 153, 227);
+    width: 75%;
+    height: 25%;
+    margin:0 auto;
+    border-radius: 70px;
+    padding: 3%;
+    padding-top: 1%;
+    {#align-content: center;#}
+    {#align-items: center;#}
+}
+
 .central_box {
     background-color: rgb(210, 233, 253);
-    width: 90%;
+    width: 75%;
+    height: 50%;
     margin:0 auto;
-    border-radius: 8px;
-    padding: 5% 15%;
+    border-radius: 70px;
+    padding: 3%; /*15%;*/
     {#align-content: center;#}
     {#align-items: center;#}
 }
@@ -103,14 +116,14 @@ img#image {
 
 table
 {
-    align-self: center;
+    align-self: auto;
     border-collapse: separate;
-    border-spacing: 0 30px;
+    border-spacing: 0 1vh;
 }
 
 td
 {
-    padding:0 50px;
+    padding:0 7vw;
 }
 
 HTML
@@ -121,14 +134,13 @@ HTML
     {#background-color: #A0FAB2;#}
 }
 
-.site_input {
-    font-size: 18px;
-    color: #000000;
+.calc {
+    text-align: center;
 }
 
 .btn {
     font-family: "Lucida Sans Unicode", sans-serif;
-    margin-left: 50px;
+    margin-left: 0px;
 }
 
 .btn2 {
@@ -140,7 +152,12 @@ HTML
     padding: 0.5% 7%;
     font-size: 18px;
     background-color: #5E84FF;
-    margin-left: 50px;
+    /*margin-left: 50px;*/
+    margin-top: 20px;
+    position: relative;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 .download-button {

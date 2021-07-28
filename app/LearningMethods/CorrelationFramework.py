@@ -45,8 +45,8 @@ def use_corr_framwork(X: pd.DataFrame, y, title=None, folder=""):
     shuffled_hist_dict = {'bins': 30, 'color': 'b', 'label': 'Shuffled values', 'density': True, 'alpha': 0.5}
     cf.plot.plot_real_and_shuffled_hist(ax2, real_hist_dict=real_hist_dict, shuffled_hist_dict=shuffled_hist_dict)
 
-    if title is not None:
-        fig1.suptitle(title.replace("_", " "), fontsize=16)
+    # if title is not None:
+    #     fig1.suptitle(title.replace("_", " "), fontsize=16)
 
     fig1.tight_layout()
     fig1.savefig(f"{folder}/{title}.png")
