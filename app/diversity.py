@@ -16,7 +16,7 @@ class Diversity(object):
         otu_df = mapping_file.otu_features_df.copy()
         self.sample_ids = otu_df.index[:-1]
         self.otu_ids = otu_df.iloc[[-1]]
-        self.otu_df = otu_df.iloc[:-1].dropna(axis=1)
+        self.otu_df = otu_df.iloc[:-1].dropna(axis=1).apply(pd.to_numeric, errors='ignore')
 
 
     def compute_beta(self, metric="unweighted_unifrac"):
@@ -71,9 +71,12 @@ class Diversity(object):
         return pd.Series(dist_series)
 
 
-    def plot_beta(self, metric="unweighted_unifrac", title="beta_diversity", folder="Plot", **kwargs):
+    def plot_beta(self, metric="unweighted_unifrac", title="beta_diversity", folder="Plot", label=None, **kwargs):
         df = self.compute_beta(metric)
-        PCoA_and_plot(df, title=title, folder=folder, **kwargs)
+        if label:
+            PCoA_and_plot(df, title=title, folder=folder, label=label, **kwargs)
+        else:
+            PCoA_and_plot(df, title=title, folder=folder, **kwargs)
         return df
 
 
