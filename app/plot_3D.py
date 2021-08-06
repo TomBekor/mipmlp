@@ -102,11 +102,11 @@ def PCA_t_test(group_1, group_2, title="t_test", save=False, folder=None):
 
     return result
 
-def PCoA_and_plot(dist, title="beta_diversity", folder="Plot", n_comp=3, **kwargs):
+def PCoA_and_plot(dist, title="beta_diversity", folder="Plot", n_comp=3, label=pd.Series(range(256)), **kwargs):
     mds = MDS(n_components=n_comp, dissimilarity="precomputed", **kwargs)
     pos = mds.fit(dist).embedding_
     if n_comp == 3:
-        fig, ax = plot_data_3d(pd.DataFrame(pos), pd.Series(range(256)))
+        fig, ax = plot_data_3d(pd.DataFrame(pos), label)
         ax.set_title(title)
         plt.savefig(f"{folder}/{title}.png")
     else:
