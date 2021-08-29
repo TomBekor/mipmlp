@@ -33,12 +33,14 @@ def create_tax_tree(series, zeroflag=True):
     tempGraph = nx.Graph()
     """workbook = load_workbook(filename="random_Otus.xlsx")
     sheet = workbook.active"""
+
     valdict = {("Bacteria",): [0,0], ("Archaea",): [0,0]}
     bac = []
     for i, (tax, val) in enumerate(series.items()):
         # adding the bacteria in every column
         bac.append(Bacteria(tax, val))
         if len(bac[i].lst) == 1 and bac[i].lst[0] == "Bacteria":
+
             valdict[("Bacteria",)][0] += bac[i].val
             valdict[("Bacteria",)][1] = 1
         if len(bac[i].lst) == 1 and bac[i].lst[0] == "Archaea":
@@ -48,6 +50,7 @@ def create_tax_tree(series, zeroflag=True):
         tempGraph.add_edge(("anaerobe",), (bac[i].lst[0],))
         # connecting all levels of the taxonomy
         for j in range(0, len(bac[i].lst) - 1):
+
             updateval(tempGraph, bac[i], valdict, j, 1)
         # adding the value of the last node in the chain
         updateval(tempGraph, bac[i], valdict, len(bac[i].lst) - 1, 0)
@@ -56,6 +59,7 @@ def create_tax_tree(series, zeroflag=True):
 
 
 def updateval(graph, bac, vald, num, adde):
+
     if adde == 1:
         graph.add_edge(tuple(bac.lst[:num+1]), tuple(bac.lst[:num+2]))
     # adding the value of the nodes

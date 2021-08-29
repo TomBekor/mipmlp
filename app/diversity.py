@@ -81,6 +81,6 @@ class Diversity(object):
 
 
 if __name__ == "__main__":
-    diversity = Diversity("OTU.csv")
+    diversity = Diversity("stool_2_all.csv")
     diversity.compute_alpha()
     diversity.plot_beta(metric="weighted_unifrac")
