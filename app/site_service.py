@@ -171,7 +171,8 @@ def results_page():
     ip = request.environ['REMOTE_ADDR']
     with open("static/IPs.txt", "r") as f:
         if f.read() == ip or f.read() == '':
-            path = STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.png'
+            path1 = STATIC_PATH + 'Correlation_between_each_component_and_the_label_prognosis_task.png'
+            path2 = STATIC_PATH + 'phylotree.svg'
             if request.method == 'POST':
                 tag_file = request.files['tag_file']
                 tag_file.save("TAG.csv")
@@ -184,7 +185,8 @@ def results_page():
                     images_names = json.loads(f.read())
             if type(images_names) == list:
                 if is_tag:
-                    images_names.append(path)
+                    images_names.append(path1)
+                    images_names.append(path2)
     with open("static/IPs.txt", "w") as f:
         f.write(ip)
     return render_template('images.html', active='Results', images_names=images_names, tag_file=tag_file)

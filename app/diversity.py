@@ -6,7 +6,7 @@ from skbio.diversity import alpha_diversity
 
 from plot_3D import PCoA_and_plot
 from create_otu_and_mapping_files import CreateOtuAndMappingFiles
-from LearningMethods.textreeCreate import create_tax_tree
+from LearningMethods.taxtreeCreate import create_tax_tree
 
 
 class Diversity(object):
@@ -81,6 +81,6 @@ class Diversity(object):
 
 
 if __name__ == "__main__":
-    diversity = Diversity("OTU.csv")
+    diversity = Diversity("stool_2_all.csv")
     diversity.compute_alpha()
     diversity.plot_beta(metric="weighted_unifrac")

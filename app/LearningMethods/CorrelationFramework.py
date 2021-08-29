@@ -4,6 +4,7 @@ import Plot.plot_positive_negative_bars as PP
 import Plot.plot_real_and_shuffled_hist as PPR
 from matplotlib.pyplot import Axes
 import matplotlib.pyplot as plt
+from Plot import new_taxtreeDraw
 
 
 class CorrelationFramework:
@@ -44,6 +45,7 @@ def use_corr_framwork(X: pd.DataFrame, y, title=None, folder=""):
     real_hist_dict = {'bins': 30, 'color': 'g', 'label': 'Real values', 'density': True, 'alpha': 0.5}
     shuffled_hist_dict = {'bins': 30, 'color': 'b', 'label': 'Shuffled values', 'density': True, 'alpha': 0.5}
     cf.plot.plot_real_and_shuffled_hist(ax2, real_hist_dict=real_hist_dict, shuffled_hist_dict=shuffled_hist_dict)
+    new_taxtreeDraw.draw_tree(X.drop("else;", axis=1).mean(axis=0))
 
     # if title is not None:
     #     fig1.suptitle(title.replace("_", " "), fontsize=16)
