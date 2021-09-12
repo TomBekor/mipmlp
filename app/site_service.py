@@ -167,7 +167,7 @@ def about_page():
 def results_page():
     images_names = None
     is_tag = False
-    tag_file=None
+    tag_file = None
     ip = request.environ['REMOTE_ADDR']
     with open("static/IPs.txt", "r") as f:
         if f.read() == ip or f.read() == '':
@@ -178,8 +178,12 @@ def results_page():
                 tag_file.save("TAG.csv")
                 with open("static/params.txt", "r") as f:
                     params = json.loads(f.read())
-                    service.evaluate(params, False)
-                    is_tag = True
+                    if tag_file:
+                        service.evaluate(params, False)
+                        is_tag = True
+                    else:
+                        service.evaluate(params, True)
+                        is_tag = False
             if os.stat("static/im_name.txt").st_size != 0:
                 with open("static/im_name.txt", "r") as f:
                     images_names = json.loads(f.read())
