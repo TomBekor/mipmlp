@@ -45,6 +45,7 @@ def get_tree_shape(newick, graph, lower_threshold, higher_threshold):
         n.set_style(nstyle)
     ts = TreeStyle()
     ts.show_leaf_name = True
+    ts.show_branch_length = False
     ts.min_leaf_separation = 0.5
     ts.mode = "c"
     ts.root_opening_factor = 0.75
